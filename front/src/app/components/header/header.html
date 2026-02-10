@@ -1,0 +1,346 @@
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="assets/logocoingeckosemonome.png" alt="Logo" width="75" height="65" class="d-inline-block align-text-top me-1">
+      <span class="brand-text">CoinMonitor</span>
+    </a>
+
+    <div class="d-flex align-items-center">
+      <button *ngIf="!ehPaginaDashboard()" 
+              type="button" 
+              class="btn btn-primary me-3" 
+              data-bs-toggle="modal" 
+              data-bs-target="#loginModal">
+        Conecte-se
+      </button>
+
+      <div *ngIf="ehPaginaDashboard()" class="d-flex align-items-center gap-2 me-3">
+        <button class="btn btn-icon-dark" 
+                title="Configurações" 
+                data-bs-toggle="modal" 
+                data-bs-target="#settingsModal"
+                (click)="abrirConfiguracoes()"> <i class="bi bi-person-fill"></i>
+        </button>
+        <button class="btn btn-icon-danger d-flex align-items-center gap-2" (click)="logout()" title="Sair">
+          <i class="bi bi-box-arrow-right"></i>
+          <span class="d-none d-md-inline fw-bold" style="font-size: 0.9rem;">Sair</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content custom-modal-dark">
+      
+      <div class="modal-header border-0 pb-0">
+        <button type="button" id="closeLoginModal" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4 pt-2">
+        <h3 class="fw-bold mb-4 text-center">Acesse sua conta</h3>
+        
+        <form>
+          <div class="mb-3">
+            <label for="emailInput" class="form-label small text-secondary">Email</label>
+            <input type="email" class="form-control dark-input" id="emailInput" placeholder="seu@email.com" name="email" [(ngModel)]="loginData.email">
+          </div>
+          
+          <div class="mb-4">
+            <label for="passInput" class="form-label small text-secondary">Senha</label>
+            <div class="input-group">
+              <input [type]="showPassword ? 'text' : 'password'" class="form-control dark-input border-end-0" id="passInput" placeholder="••••••••" name="password" [(ngModel)]="loginData.senha">
+              <button class="btn btn-outline-secondary dark-input border-start-0 text-secondary" type="button" (click)="togglePassword()" style="border-color: #2a2f3a;"> 
+                <span *ngIf="!showPassword">👁️</span> <span *ngIf="showPassword">🙈</span> 
+              </button>
+            </div>
+          </div>
+          
+          <button type="button" (click)="onLogin()" class="btn btn-primary w-100 py-2 fw-bold mb-3" style="background: #0066FF; border: none;">
+            Entrar
+          </button>
+        </form>
+
+        <div class="text-center position-relative my-4">
+          <hr class="border-secondary opacity-25">
+          <span class="position-absolute top-50 start-50 translate-middle px-3 bg-modal-dark text-secondary small">
+            Ou continue com
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-center w-100">
+            <asl-google-signin-button type="standard" theme="filled_black" size="large" text="signin_with" [width]="350"></asl-google-signin-button>
+        </div>
+
+        <p class="text-center mt-4 mb-0 small text-secondary">
+          Não tem uma conta? 
+          <a href="#" class="text-white text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#registerModal">
+            Cadastre-se
+          </a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div> 
+
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content custom-modal-dark">
+      
+      <div class="modal-header border-0 pb-0">
+        <button type="button" id="closeRegisterModal" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4 pt-2">
+        
+        <h3 class="fw-bold mb-4 text-center">
+            <span *ngIf="!showVerificationStep">Crie sua conta grátis</span>
+            <span *ngIf="showVerificationStep">Verifique seu Email</span>
+        </h3>
+        
+        <form *ngIf="!showVerificationStep" class="animate__animated animate__fadeIn"> 
+            
+            <div class="mb-3">
+               <label for="regNameInput" class="form-label small text-secondary">Nome Completo</label>
+               <input type="text" class="form-control dark-input" id="regNameInput" placeholder="Ex: Paulo Figueiredo" name="regName" [(ngModel)]="registerData.name"> 
+            </div>
+            
+            <div class="mb-3">
+                <label for="regEmailInput" class="form-label small text-secondary">Email</label>
+                <input type="email" class="form-control dark-input" id="regEmailInput" placeholder="seu@email.com" name="regEmail" [(ngModel)]="registerData.email"> 
+            </div>
+
+            <div class="mb-3">
+                <label for="regPassInput" class="form-label small text-secondary">Senha</label>
+                <input type="password" class="form-control dark-input" id="regPassInput" placeholder="••••••••" name="regPass" [(ngModel)]="registerData.senha"> 
+            </div>
+
+            <div class="mb-4">
+                <label for="regConfirmPassInput" class="form-label small text-secondary">Confirmar Senha</label>
+                <input type="password" class="form-control dark-input" id="regConfirmPassInput" placeholder="••••••••" name="regConfirmPass" [(ngModel)]="registerData.confirmPassword"> 
+            </div>
+
+            <button type="button" 
+                (click)="onRegister()" 
+                class="btn btn-primary w-100 py-2 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
+                style="background: #0066FF; border: none;"
+                [disabled]="isLoading"> <span *ngIf="!isLoading">Criar Conta</span>
+            
+            <div *ngIf="isLoading" class="spinner-border spinner-border-sm text-white" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <span *ngIf="isLoading">Criando...</span>
+
+            </button>
+        
+             <div class="text-center position-relative my-4">
+                <hr class="border-secondary opacity-25">
+                <span class="position-absolute top-50 start-50 translate-middle px-3 bg-modal-dark text-secondary small">Ou inscreva-se com</span>
+             </div>
+    
+             <div class="d-flex justify-content-center w-100">
+                  <asl-google-signin-button type="standard" theme="filled_black" size="large" text="signin_with" [width]="350"></asl-google-signin-button>
+             </div>
+
+             <p class="text-center mt-4 mb-0 small text-secondary">
+                  Já tem uma conta? 
+                  <a href="#" class="text-white text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">Entrar</a>
+             </p>
+        </form>
+
+        <div *ngIf="showVerificationStep" class="text-center animate__animated animate__fadeIn">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 70px; height: 70px;">
+                    <i class="bi bi-envelope-check-fill text-primary" style="font-size: 2rem;"></i>
+                </div>
+                <p class="text-secondary">
+                    Enviamos um código de 6 dígitos para:<br>
+                    <strong class="text-white">{{ registerData.email }}</strong>
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small text-secondary">Digite o código</label>
+                <input type="text" 
+                  class="form-control dark-input text-center fs-4 fw-bold letter-spacing-2" 
+                  placeholder="0 0 0 0 0 0" 
+                  maxlength="6"
+                  inputmode="numeric" 
+                  pattern="[0-9]*"
+                  [(ngModel)]="verificationCode"
+                  name="vCode"
+                  style="letter-spacing: 5px;">
+            </div>
+
+            <button type="button" 
+                (click)="onVerifyCode()" 
+                class="btn btn-primary w-100 py-2 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
+                style="background: #0066FF; border: none;"
+                [disabled]="isLoading">
+            
+            <span *ngIf="!isLoading">Validar Email</span>
+            
+            <div *ngIf="isLoading" class="spinner-border spinner-border-sm text-white" role="status">
+                <span class="visually-hidden">Validando...</span>
+              </div>
+          </button>
+            <div class="d-flex flex-column align-items-center mt-3">
+            
+              <p *ngIf="!canResend" class="small text-secondary mb-2">
+                  Reenviar código em <span class="text-white fw-bold">{{ tempoFormatado }}</span>
+              </p>
+
+              <button type="button" 
+                      (click)="onReenviar()" 
+                      [disabled]="!canResend || isLoading"
+                      class="btn btn-link text-decoration-none small"
+                      [class.text-muted]="!canResend"
+                      [class.text-primary]="canResend"
+                      style="cursor: pointer;">
+                  <i class="bi bi-arrow-clockwise me-1"></i> Reenviar Email
+              </button>
+              
+              <button (click)="showVerificationStep = false" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                  Voltar / Corrigir Email
+              </button>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div> 
+
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"> 
+    <div class="modal-content custom-modal-dark">
+      
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold ms-2 text-white">Minha Conta</h5>
+        <button type="button" id="closeSettingsModal" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        
+        <div class="text-center mb-3">
+            <div class="position-relative d-inline-block" style="cursor: pointer;" (click)="fileInput.click()">
+                <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl" 
+                     class="rounded-circle border border-3 border-primary object-fit-cover" 
+                     width="100" height="100"> <div *ngIf="!fotoPerfilUrl" 
+                     class="rounded-circle bg-light d-flex align-items-center justify-content-center border border-3 border-secondary" 
+                     style="width: 100px; height: 100px;">
+                    <i class="bi bi-person-fill text-secondary" style="font-size: 3.5rem;"></i>
+                </div>
+
+                <div class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-dark bg-opacity-50 d-flex align-items-center justify-content-center opacity-0 hover-show transition">
+                    <i class="bi bi-camera-fill text-white fs-4"></i>
+                </div>
+                <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
+            </div>
+            
+            <p class="text-secondary small mt-1 mb-0">
+                <span *ngIf="!userData.isGoogleAccount">Gerencie seus dados</span>
+                <span *ngIf="userData.isGoogleAccount"><i class="bi bi-google me-1"></i>Conta Google</span>
+            </p>
+        </div>
+
+        <form>
+          <div class="row g-3 mb-3">
+              
+              <div class="col-md-6">
+                <label class="form-label small text-secondary">Nome Completo</label>
+                <div class="input-group">
+                  <span class="input-group-text dark-input border-end-0 text-secondary"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control dark-input border-start-0" 
+                         [(ngModel)]="userData.nome" name="confNome"
+                         [readonly]="userData.isGoogleAccount || !editandoNome" 
+                         [class.text-muted]="!editandoNome" [class.text-white]="editandoNome">
+                  
+                  <button *ngIf="!userData.isGoogleAccount" type="button" 
+                          class="btn btn-outline-secondary dark-input border-start-0 text-info fw-bold" 
+                          (click)="toggleEditarNome()">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small text-secondary">Email</label>
+                <div class="input-group">
+                  <span class="input-group-text dark-input border-end-0 text-secondary"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control dark-input border-start-0 text-muted" 
+                         [(ngModel)]="userData.email" name="confEmail" readonly 
+                         style="cursor: not-allowed; opacity: 0.7;">
+                </div>
+              </div>
+          </div>
+
+          <div *ngIf="!userData.isGoogleAccount" class="animate__animated animate__fadeIn mb-3">
+             <label class="form-label small text-secondary">Segurança</label>
+             <div class="input-group mb-2">
+                <span class="input-group-text dark-input border-end-0 text-secondary"><i class="bi bi-lock-fill"></i></span>
+                
+                <input *ngIf="!editandoSenha" type="password" class="form-control dark-input border-start-0 text-muted" value="SenhaDummy" readonly>
+                
+                <input *ngIf="editandoSenha" [type]="showNovaSenha ? 'text' : 'password'"
+                       class="form-control dark-input border-start-0 border-end-0 text-white"
+                       [(ngModel)]="novaSenha" name="newPass" placeholder="Nova senha...">
+
+                <button *ngIf="editandoSenha" type="button"
+                        class="btn btn-outline-secondary dark-input border-start-0 border-end-0 text-secondary px-2"
+                        (click)="toggleNovaSenhaVisibility()" style="border-color: #2a2f3a;">
+                        <i class="bi" [class.bi-eye-slash-fill]="!showNovaSenha" [class.bi-eye-fill]="showNovaSenha"></i>
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary dark-input border-start-0 text-info fw-bold" (click)="toggleEditarSenha()">
+                  {{ editandoSenha ? 'Cancelar' : 'Alterar' }}
+                </button>
+             </div>
+
+             <div *ngIf="editandoSenha" class="input-group animate__animated animate__fadeIn">
+                <span class="input-group-text dark-input border-end-0 text-secondary"><i class="bi bi-check-lg"></i></span>
+                <input [type]="showConfirmSenha ? 'text' : 'password'"
+                       class="form-control dark-input border-start-0 border-end-0 text-white"
+                       placeholder="Confirme a senha..." [(ngModel)]="confirmNovaSenha" name="confPass">
+                <button type="button" class="btn btn-outline-secondary dark-input border-start-0 text-secondary"
+                        (click)="toggleConfirmSenhaVisibility()" style="border-color: #2a2f3a;">
+                        <i class="bi" [class.bi-eye-slash-fill]="!showConfirmSenha" [class.bi-eye-fill]="showConfirmSenha"></i>
+                </button>
+             </div>
+          </div>
+
+          <div *ngIf="userData.isGoogleAccount" class="alert alert-dark d-flex align-items-center mb-4 border-secondary p-2" role="alert" style="background: rgba(255,255,255,0.05);">
+            <div class="small text-secondary ps-2">
+              Dados gerenciados pelo Google. Acesse sua conta Google para alterar senha ou nome.
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+             
+             <button type="button" (click)="deletarPerfil()" 
+                     class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 border-0 opacity-75 hover-opacity-100">
+                <i class="bi bi-trash3-fill"></i> <span>Excluir Conta</span>
+             </button>
+
+             <button *ngIf="!userData.isGoogleAccount" 
+                     type="button" (click)="salvarPerfil()" 
+                     class="btn btn-primary px-4 fw-bold" 
+                     style="background: #0066FF; border: none;">
+               Salvar Alterações
+             </button>
+             
+             <button *ngIf="userData.isGoogleAccount" 
+                     type="button" data-bs-dismiss="modal" 
+                     class="btn btn-secondary px-4">
+               Fechar
+             </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

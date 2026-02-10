@@ -1,0 +1,15 @@
+# --- JAVA / SPRING ---
+target/
+*.class
+.idea/
+*.iml
+*.log
+
+# --- ANGULAR / NODE ---
+node_modules/
+dist/
+.angular/
+
+# --- SISTEMA ---
+.DS_Store
+Thumbs.db

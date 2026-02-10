@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # --- 1. BANCO DE DADOS ---
+  db:
+    image: postgres:15-alpine
+    container_name: carteira-db
+    restart: always
+    environment:
+      POSTGRES_DB: carteira_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password # Senha do banco (não é a do PC)
+    ports:
+      - "5432:5432" # Libera acesso externo para seu DBeaver/PgAdmin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- 2. BACKEND (Spring Boot) ---
+  backend:
+    build: ./back  # O Docker vai procurar o Dockerfile dentro da pasta 'back'
+    container_name: carteira-api
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      # A MÁGICA: Aqui usamos 'db' no lugar de localhost.
+      # O Docker resolve o nome do serviço automaticamente!
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/carteira_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+      # Suas variáveis de segurança
+      JWT_SECRET: "minha_senha_super_secreta_para_testes_locais"
+      MAIL_PASSWORD: "sua_senha_de_app_gmail"
+
+      # Permite que o navegador (Angular) acesse a API
+      CORS_ORIGINS: "http://localhost:4200"
+    depends_on:
+      - db # Espera o banco iniciar antes de subir o Java
+
+  # --- 3. FRONTEND (Angular) ---
+  # Se você ainda não criou o Dockerfile do front, comente essa seção inteira
+  frontend:
+    build: ./front # Procura Dockerfile na pasta 'front'
+    container_name: carteira-front
+    restart: always
+    ports:
+      - "4200:80" # Mapeia a porta 80 do Nginx (container) para 4200 do PC
+    depends_on:
+      - backend
+
+# Volume para persistir os dados do banco mesmo se desligar o Docker
+volumes:
+  postgres_data:

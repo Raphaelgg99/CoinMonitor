@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+/* styles.css (Global) */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0b0e14; /* A MESMA cor do fundo da sua Hero Section */
+    color: #ffffff; /* Garante que textos soltos fiquem brancos */
+}
+
+/* Isso remove margens automáticas que criam buracos */
+app-root {
+    display: block;
+    background-color: #0b0e14;
+}

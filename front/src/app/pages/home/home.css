@@ -1,0 +1,253 @@
+/* Configuração Principal da Seção */
+.hero-section {
+    min-height: 90vh;
+    background: radial-gradient(circle at center, #1a1f2e 0%, #0b0e14 100%); /* Um gradiente sutil no fundo preto */
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+}
+
+/* === CONFIGURAÇÃO DAS ONDAS === */
+.waves-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%; /* Ocupa a metade de baixo da tela */
+    z-index: 1; /* Fica atrás do texto */
+    pointer-events: none; /* Para não atrapalhar cliques */
+}
+
+.waves {
+    width: 100%;
+    height: 100%;
+}
+
+/* Animação das Ondas */
+.parallax > use {
+    animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+}
+
+.parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+}
+.parallax > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+}
+.parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+}
+.parallax > use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+} 
+
+/* Botão Crypto - Versão Equilibrada (Middle Ground) */
+.btn-crypto {
+    /* Gradiente mais "corporativo" (Azul Royal -> Ciano) */
+    /* Isso garante contraste para ler o texto branco */
+    background: linear-gradient(90deg, #0052cc 0%, #00b4db 100%) !important;
+    
+    /* Texto Branco: Mais limpo e elegante */
+    color: #ffffff !important;
+    font-weight: 600 !important; /* Negrito, mas sem exagero */
+    font-size: 1.1rem; /* Um pouco maior para leitura fácil */
+    
+    /* Formato */
+    padding: 12px 32px;
+    border-radius: 8px; /* Bordas arredondadas modernas */
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    
+    /* Sombra Sutil (Drop Shadow) para destacar do fundo preto, sem brilhar neon */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    
+    transition: all 0.3s ease;
+}
+
+/* Efeito Hover: Fica levemente mais claro e sobe */
+.btn-crypto:hover {
+    /* filter: brightness aumenta o brilho sem mudar a cor */
+    filter: brightness(1.15); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 180, 219, 0.4); /* Sombra azulada suave só quando passa o mouse */
+    cursor: pointer;
+}
+
+@keyframes move-forever {
+    0% { transform: translate3d(-90px,0,0); }
+    100% { transform: translate3d(85px,0,0); }
+}
+
+/* === Mantenha o resto do seu CSS (text-gradient, floating-anim, etc) abaixo === */
+.text-secondary {
+    color: #b0b3b8 !important;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, #00F2FF 0%, #0066FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Se quiser manter a animação da imagem flutuando */
+.floating-anim {
+    animation: float 6s ease-in-out infinite;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 242, 255, 0.1); /* Sombra azulada */
+    position: relative;
+    z-index: 3; /* Imagem fica acima das ondas */
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}  
+
+/* === SEÇÃO DE BENEFÍCIOS === */
+.benefits-section {
+    background-color: #0b0e14; /* Mantém o fundo escuro contínuo */
+    color: white;
+    position: relative;
+    z-index: 5; /* Fica acima das ondas */
+}
+
+/* Títulos coloridos */
+.text-gradient-green {
+    background: linear-gradient(90deg, #00ff88 0%, #00cc6a 100%); 
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue {
+    background: linear-gradient(90deg, #00F2FF 0%, #0066FF 100%); 
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Ícones */
+.icon-box {
+    background: rgba(255, 255, 255, 0.05);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === REPRESENTAÇÃO GRÁFICA DO PIE CHART (CSS ONLY) === */
+.chart-placeholder {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+        #e91e63 0% 35%,   /* Rosa */
+        #ffc107 35% 60%,  /* Amarelo */
+        #00e676 60% 85%,  /* Verde */
+        #2979ff 85% 100%  /* Azul */
+    );
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+/* Buraco no meio para parecer donut chart */
+.chart-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px; height: 180px;
+    background-color: #0b0e14;
+    border-radius: 50%;
+}
+
+/* === REPRESENTAÇÃO DOS CARDS FLUTUANTES === */
+.cards-stack {
+    position: relative;
+    height: 300px;
+    width: 300px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 12px;
+    position: absolute;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 200px;
+    transition: transform 0.3s ease;
+}
+
+.card-1 { top: 20%; left: 0; z-index: 1; border-left: 4px solid #00F2FF; }
+.card-2 { top: 40%; left: 30%; z-index: 2; border-left: 4px solid #e91e63; transform: scale(1.1); background: rgba(30, 30, 30, 0.8);}
+.card-3 { top: 60%; left: 10%; z-index: 3; border-left: 4px solid #ffc107; }
+
+/* Animação suave */
+.floating-slow {
+    animation: float-chart 4s ease-in-out infinite;
+}
+
+/* === RODAPÉ (FOOTER) === */
+.footer-section {
+    background-color: #05070a; /* Fundo quase preto total */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Linha sutil no topo */
+    font-size: 0.9rem;
+}
+
+/* Efeito nos links quando passa o mouse */
+.hover-white:hover {
+    color: #fff !important;
+    transition: color 0.3s ease;
+}
+
+.border-secondary {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+@keyframes float-chart {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* === AJUSTES PARA CELULAR (Telas menores que 992px) === */
+@media (max-width: 991px) {
+    .hero-section {
+        /* Garante que ocupe 85% da altura da tela do celular */
+        min-height: 85vh; 
+        /* Centraliza tudo verticalmente */
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        overflow: hidden; /* Importante para não criar barra de rolagem lateral */
+    }
+
+    /* Aumenta um pouco as ondas no celular para preencherem mais */
+    .waves-container {
+        height: 70%;   
+        /* O PULO DO GATO PARA ESTICAR AS ONDAS 👇 */
+        width: 400%; /* Faz as ondas terem 4x o tamanho da tela */
+        left: -150%; /* Centraliza essas ondas gigantes */
+    }
+    
+    /* Ajuste no tamanho do título para não ficar gigante no celular */
+    .display-3 {
+        font-size: 2.5rem; 
+    } 
+
+    .chart-placeholder, .cards-stack {
+        transform: scale(0.8); /* Diminui um pouco no celular */
+        margin-bottom: 2rem;
+    }
+}

@@ -1,0 +1,174 @@
+/* Importando a fonte Montserrat do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+
+/* Estilo do Texto "CoinMonitor" */
+.brand-text {
+    font-family: 'Montserrat', sans-serif; /* Fonte moderna e geométrica */
+    font-weight: 700; /* Negrito */
+    font-size: 1.5rem; /* Tamanho 24px */
+    letter-spacing: -0.5px; /* Letras levemente mais juntas (estilo tech) */
+    
+    /* O Segredo do Gradiente no Texto 👇 */
+    background: linear-gradient(90deg, #00F2FF 0%, #0066FF 100%); /* Ciano para Azul */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Ajuste fino na navbar para garantir alinhamento */
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+} 
+
+.btn-primary{
+    /* O Gradiente que você quer */
+    background: linear-gradient(90deg, #00F2FF 0%, #0066FF 100%) !important;
+    
+    color: white !important;
+    font-weight: 700;
+    border: none !important; /* Tira a borda padrão feia */
+    
+    /* O Brilho Neon */
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.6); 
+    
+    /* Tamanho e transição */
+    padding: 10px 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+} 
+
+/* Efeito ao passar o mouse (Hover) */
+.btn-primary:hover {
+    background: linear-gradient(90deg, #00c4cf 0%, #0052cc 100%) !important;
+    transform: translateY(-2px); /* Sobe um pouquinho */
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.8); /* Brilha mais forte */
+} 
+
+/* === ESTILOS DO MODAL DARK === */
+.custom-modal-dark {
+    background-color: #1a1f2e; /* Fundo cinza escuro */
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+/* Fundo da "linha divisória" precisa ser igual ao do modal */
+.bg-modal-dark {
+    background-color: #1a1f2e; 
+}
+
+/* Inputs Escuros */
+.dark-input {
+    background-color: #0b0e14;
+    border: 1px solid #2a2f3a;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.dark-input:focus {
+    background-color: #0b0e14;
+    border-color: #0066FF;
+    color: white;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.25);
+}
+
+.social-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+} 
+
+/* Botão de Configuração (Cinza Transparente) */
+.btn-icon-dark {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-dark:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(45deg); /* Efeito legal de girar a engrenagem */
+    color: #00F2FF; /* Fica ciano no hover */
+}
+
+/* Botão de Sair (Vermelho Neon Suave) */
+.btn-icon-danger {
+    background-color: transparent;
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-danger:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+    transform: translateY(-2px);
+    color: #ffcccc;
+} 
+
+/* Botão de Configuração (Cinza Transparente) */
+.btn-icon-dark {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-dark:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(45deg); /* Efeito legal de girar a engrenagem */
+    color: #00F2FF; /* Fica ciano no hover */
+}
+
+/* Botão de Sair (Vermelho Neon Suave) */
+.btn-icon-danger {
+    background-color: transparent;
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-danger:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+    transform: translateY(-2px);
+    color: #ffcccc;
+} 
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Classe que aplica a animação */
+.animate__fadeIn {
+  animation: fadeIn 0.4s ease-out;
+} 
+
+.object-fit-cover {
+    object-fit: cover; /* Garante que a foto não fique esticada */
+}
+
+/* Efeito de Hover na Foto */
+.hover-show:hover {
+    opacity: 1 !important;
+    transition: opacity 0.3s ease-in-out;
+}

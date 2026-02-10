@@ -1,0 +1,358 @@
+<div class="container mt-4"> 
+
+  <div *ngIf="mostrarAvisoPrecos" class="alert alert-dismissible fade show d-flex align-items-center mb-4 animate__animated animate__fadeInDown" 
+       role="alert" 
+       style="background-color: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; color: #ffca2c;">
+    
+    <i class="bi bi-info-circle-fill me-3 fs-3"></i>
+    
+    <div>
+      <h5 class="alert-heading fw-bold mb-1" style="font-size: 1rem;">Atualização de Preços</h5>
+      <p class="mb-0 small">
+        Se os valores dos seus ativos aparecerem <strong>zerados (R$0,00)</strong>, não se preocupe! 
+        O sistema pode levar até <strong>5 minutos</strong> para sincronizar com o mercado global.
+      </p>
+    </div>
+
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="fecharAviso()"></button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-white">Carregando carteira...</p>
+  </div>
+
+  <div *ngIf="!isLoading && carteira">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="text-white mb-0">Olá, {{ carteira.usuarioNome }}</h2>
+      
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-light" 
+                [class.active]="moedaSelecionada === 'BRL'"
+                (click)="moedaSelecionada = 'BRL'">
+          🇧🇷 BRL
+        </button>
+        <button type="button" class="btn btn-outline-light" 
+                [class.active]="moedaSelecionada === 'USD'"
+                (click)="moedaSelecionada = 'USD'">
+          🇺🇸 USD
+        </button>
+        <button type="button" class="btn btn-outline-light" 
+                [class.active]="moedaSelecionada === 'EUR'"
+                (click)="moedaSelecionada = 'EUR'">
+          🇪🇺 EUR
+        </button>
+      </div>
+    </div>
+    
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card bg-success text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Patrimônio ({{ moedaSelecionada }})</h5>
+            
+            <h2 class="card-text">
+              <span *ngIf="moedaSelecionada === 'BRL'">{{ carteira.seuSaldoTotalBRL | currency:'BRL' }}</span>
+              <span *ngIf="moedaSelecionada === 'USD'">{{ carteira.seuSaldoTotalUSD | currency:'USD' }}</span>
+              <span *ngIf="moedaSelecionada === 'EUR'">{{ carteira.seuSaldoTotalEUR | currency:'EUR' }}</span>
+            </h2>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="text-white">Meus Ativos</h3>
+      <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
+        Adicionar Moeda +
+      </button> 
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-dark table-hover table-borderless align-middle">
+        <thead>
+          <tr>
+            <th>Moeda</th>
+            <th>Qtd</th>
+            <th>Preço ({{ moedaSelecionada }})</th>
+            <th>Total ({{ moedaSelecionada }})</th>
+            <th class="text-end">Ações</th> 
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let moeda of carteira.moedas">
+            
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <img *ngIf="moeda.logo" [src]="moeda.logo" alt="icon" width="25" height="25" style="border-radius: 50%;">
+                <span *ngIf="!moeda.logo" class="text-info">●</span>
+                <span class="text-uppercase fw-bold">{{ moeda.coinId }}</span>
+              </div>
+            </td>
+
+            <td>{{ moeda.quantidade }}</td>
+            
+            <td>
+              <span *ngIf="moedaSelecionada === 'BRL'">{{ moeda.precoAtualBRL | currency:'BRL' }}</span>
+              <span *ngIf="moedaSelecionada === 'USD'">{{ moeda.precoAtualUSD | currency:'USD' }}</span>
+              <span *ngIf="moedaSelecionada === 'EUR'">{{ moeda.precoAtualEUR | currency:'EUR' }}</span>
+            </td>
+
+            <td class="text-success fw-bold">
+              <span *ngIf="moedaSelecionada === 'BRL'">{{ moeda.seuSaldoEmBRL | currency:'BRL' }}</span>
+              <span *ngIf="moedaSelecionada === 'USD'">{{ moeda.seuSaldoEmUSD | currency:'USD' }}</span>
+              <span *ngIf="moedaSelecionada === 'EUR'">{{ moeda.seuSaldoEmEUR | currency:'EUR' }}</span>
+            </td>
+            
+            <td class="text-end"> 
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-outline-info d-flex align-items-center justify-content-center" 
+                  style="width: 32px; height: 32px; padding: 0;"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#modalGrafico"
+                  (click)="abrirGrafico(moeda.coinId)">
+                  <i class="bi bi-graph-up"></i>
+                </button>
+                
+                <button class="btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center" 
+                        style="width: 32px; height: 32px; padding: 0;"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modalEditar"
+                        (click)="prepararEdicao(moeda)">
+                  <i class="bi bi-pencil-square" style="font-size: 1rem;"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" 
+                        style="width: 32px; height: 32px; padding: 0;"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modalExclusao"
+                        (click)="prepararExclusao(moeda.coinId)">
+                  <i class="bi bi-trash-fill" style="font-size: 1rem;"></i> 
+                </button> 
+              </div> 
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="carteira.moedas.length === 0" class="alert alert-secondary text-center opacity-75">
+      Sua carteira está vazia. Adicione uma moeda acima! 🚀
+    </div>
+
+  </div>
+</div> 
+
+<div class="modal fade" id="modalAdicionar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-secondary">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-info" id="modalLabel">Nova Criptomoeda</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="adicionarMoeda()">
+          
+          <div class="mb-3 position-relative"> 
+            <label for="coinId" class="form-label">Nome da Moeda</label>
+            <input type="text" class="form-control bg-secondary text-white border-0" 
+                   id="coinId" 
+                   [(ngModel)]="novaMoedaId" name="coinId" 
+                   (input)="buscarSugestoes($event)" 
+                   (blur)="esconderSugestoes()"
+                   placeholder="Digite para buscar (ex: bit...)" 
+                   autocomplete="off" required>
+            
+            <div class="form-text text-light opacity-50">
+              Selecione a moeda na lista que aparecerá.
+            </div>
+
+            <ul class="list-group position-absolute w-100 mt-1 shadow" 
+                style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+                *ngIf="mostrandoSugestoes && sugestoesMoedas.length > 0">
+              
+              <li class="list-group-item list-group-item-action bg-dark text-white border-secondary d-flex align-items-center gap-2"
+                  style="cursor: pointer;"
+                  *ngFor="let moeda of sugestoesMoedas"
+                  (click)="selecionarSugestao(moeda)">
+                
+                <img [src]="moeda.thumb" alt="icon" style="width: 20px; height: 20px; border-radius: 50%;">
+                
+                <div>
+                  <span class="fw-bold">{{ moeda.name }}</span> 
+                  <span class="text-muted small ms-2">({{ moeda.symbol }})</span>
+                </div>
+
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <label for="quantidade" class="form-label">Quantidade</label>
+            <input type="number" class="form-control bg-secondary text-white border-0" 
+                   id="quantidade" 
+                   [(ngModel)]="novaMoedaQtd" name="quantidade" 
+                   placeholder="0.00" step="0.0001" required>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" id="fecharModalBtn" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-info fw-bold">Salvar Moeda</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-danger">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-danger">Confirmar Exclusão</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body text-center">
+        <p class="fs-5">Tem certeza que deseja remover esta moeda?</p>
+        
+        <h2 class="text-uppercase fw-bold text-warning" *ngIf="moedaParaExcluir">
+          {{ moedaParaExcluir }}
+        </h2>
+        
+        <p class="text-muted small mt-3">Essa ação removerá a moeda da sua carteira.</p>
+      </div>
+
+      <div class="modal-footer border-secondary justify-content-center">
+        <button type="button" id="fecharModalExclusaoBtn" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger fw-bold" (click)="confirmarExclusao()">
+          Sim, Excluir
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div> 
+
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-warning">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-warning">Editar Quantidade</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="confirmarEdicao()">
+          
+          <div class="mb-3 text-center">
+            <h3 class="text-uppercase fw-bold text-white">{{ moedaParaEditar }}</h3>
+          </div>
+
+          <div class="mb-3">
+            <label for="qtdEditar" class="form-label">Nova Quantidade Total</label>
+            <input type="number" class="form-control bg-secondary text-white border-0" 
+                   id="qtdEditar" 
+                   [(ngModel)]="qtdParaEditar" name="qtdEditar" 
+                   placeholder="0.00" step="0.0001" required>
+            <div class="form-text text-light opacity-50">
+              Isso substituirá o valor atual.
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" id="fecharModalEdicaoBtn" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-warning fw-bold text-dark">Salvar Alterações</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 
+<div class="modal fade" id="modalGrafico" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-white border-info">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-info text-uppercase">
+          Histórico: {{ moedaGraficoId }} 
+          <span class="text-muted small ms-2" style="font-size: 0.8rem">
+            ({{ periodoSelecionado === '1' ? '24 Horas' : 
+                periodoSelecionado === '7' ? '7 Dias' : 
+                periodoSelecionado === '30' ? '30 Dias' : 
+                periodoSelecionado === '90' ? '3 Meses' : '1 Ano' }})
+          </span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      
+      <div class="modal-body">
+        
+        <div class="d-flex justify-content-center mb-4">
+          <div class="btn-group" role="group">
+            
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    [class.active]="periodoSelecionado === '1'"
+                    (click)="carregarGraficoComPeriodo('1')">
+              24H
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    [class.active]="periodoSelecionado === '7'"
+                    (click)="carregarGraficoComPeriodo('7')">
+              7D
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    [class.active]="periodoSelecionado === '30'"
+                    (click)="carregarGraficoComPeriodo('30')">
+              30D
+            </button>
+            
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    [class.active]="periodoSelecionado === '90'"
+                    (click)="carregarGraficoComPeriodo('90')">
+              3M
+            </button>
+
+             <button type="button" class="btn btn-outline-secondary btn-sm"
+                    [class.active]="periodoSelecionado === '365'"
+                    (click)="carregarGraficoComPeriodo('365')">
+              1 Ano
+            </button>
+
+          </div>
+        </div>
+        <div *ngIf="carregandoGrafico" class="text-center p-5">
+          <div class="spinner-border text-info" role="status"></div>
+          <p class="mt-2 text-muted">Buscando dados na Blockchain...</p>
+        </div>
+
+        <div *ngIf="!carregandoGrafico">
+          <apx-chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [xaxis]="chartOptions.xaxis"
+            [stroke]="chartOptions.stroke"
+            [tooltip]="chartOptions.tooltip"
+            [dataLabels]="chartOptions.dataLabels"
+            [fill]="chartOptions.fill"
+            [theme]="chartOptions.theme"
+            [yaxis]="chartOptions.yaxis"
+          ></apx-chart>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
