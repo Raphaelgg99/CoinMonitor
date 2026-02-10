@@ -53,6 +53,7 @@ public class WebSecurityConfig {
         http
                 .cors(Customizer.withDefaults()) // <--- SÓ ADICIONEI ISSO AQUI
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/criarusuario").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/verificar").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/reenviar").permitAll()
