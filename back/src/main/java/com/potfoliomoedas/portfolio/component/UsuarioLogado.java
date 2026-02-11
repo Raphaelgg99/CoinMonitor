@@ -15,7 +15,6 @@ public class UsuarioLogado {
     @Autowired
     UsuarioRepository repository;
 
-    @Transactional(readOnly = true)
     public Usuario getUsuarioLogado() {
         // Pega o email (ou "subject") do usuário que o JWTFilter colocou no contexto
         String usuarioEmail = SecurityContextHolder.getContext().getAuthentication().getName();
