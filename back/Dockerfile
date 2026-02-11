@@ -10,7 +10,7 @@ RUN mvn dependency:go-offline
 
 # Copia o código fonte e compila
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package -Dmaven.test.skip=true
 
 # ====== ESTÁGIO 2: RUNTIME ======
 # Aqui usamos o Alpine (super leve) apenas para rodar
