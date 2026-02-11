@@ -39,7 +39,7 @@ public class LoginController {
             throws GeneralSecurityException, IOException {
         try {
             // Chama o serviço que faz toda a mágica (valida, cria user, gera token)
-            Sessao sessao = loginService.logarComGoogle(body.getToken());
+            Sessao sessao = loginService.logarComGoogle(body.token);
             return ResponseEntity.ok(sessao);
         }
         catch (Exception e) {
