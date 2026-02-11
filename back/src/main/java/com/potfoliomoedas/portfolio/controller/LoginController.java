@@ -6,6 +6,7 @@ import com.potfoliomoedas.portfolio.dto.Sessao;
 import com.potfoliomoedas.portfolio.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,10 +35,11 @@ public class LoginController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity<Sessao> loginGoogle(@RequestBody GoogleLoginDTO body) throws GeneralSecurityException, IOException {
+    public ResponseEntity<Sessao> loginGoogle(@RequestBody GoogleLoginDTO body)
+            throws GeneralSecurityException, IOException {
         try {
             // Chama o serviço que faz toda a mágica (valida, cria user, gera token)
-            Sessao sessao = loginService.logarComGoogle(body.token);
+            Sessao sessao = loginService.logarComGoogle(body.getToken());
             return ResponseEntity.ok(sessao);
         }
         catch (Exception e) {

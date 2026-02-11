@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -74,7 +75,9 @@ public class LoginService {
         return new Sessao(usuario.getEmail(), token);
     }
 
-    public Sessao logarComGoogle(String tokenGoogle) throws GeneralSecurityException, IOException {
+    @Transactional
+    public Sessao logarComGoogle(String tokenGoogle) throws
+            GeneralSecurityException, IOException {
 
         GoogleIdToken idToken = validarTokenNoGoogle(tokenGoogle);
 
