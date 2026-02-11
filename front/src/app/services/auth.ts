@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core'; 
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators'; 
+import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService { 
+export class AuthService {
 
   // URL Base do seu Back-end (Sem o /auth, baseado no seu Controller)
-  private apiUrl = 'http://localhost:8080'; 
+  private apiUrl = 'https://coinmonitor.onrender.com';
 
-  constructor(private http: HttpClient, private router: Router) { } 
+  constructor(private http: HttpClient, private router: Router) { }
 
   loginGoogle(token: string) {
   // Ajuste a URL se necessário
@@ -41,7 +41,7 @@ export class AuthService {
         }
       })
     );
-  } 
+  }
 
   // Função de registro de um novo usuário
   register(userData: any) {
@@ -54,16 +54,16 @@ export class AuthService {
 
     // Envia os dados para o backend para criar o usuário
     return this.http.post(`${this.apiUrl}/usuario/criarusuario`, payload)
-  } 
+  }
 
   verifyEmail(payload: { email: string, codigo: string }): Observable<any> {
-    return this.http.post('http://localhost:8080/usuario/verificar', payload);
-  } 
+    return this.http.post(`${this.apiUrl}/usuario/verificar`, payload);
+  }
 
   resendCode(email: string): Observable<any> {
   // O Java espera um JSON: {"email": "..."}
   const payload = { email: email };
-  
-  return this.http.post('http://localhost:8080/usuario/reenviar', payload);
+
+  return this.http.post(`${this.apiUrl}/usuario/reenviar`, payload);
 }
 }
