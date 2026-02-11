@@ -6,6 +6,8 @@ import com.potfoliomoedas.portfolio.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Component
 public class UsuarioLogado {
@@ -13,6 +15,7 @@ public class UsuarioLogado {
     @Autowired
     UsuarioRepository repository;
 
+    @Transactional(readOnly = true)
     public Usuario getUsuarioLogado() {
         // Pega o email (ou "subject") do usuário que o JWTFilter colocou no contexto
         String usuarioEmail = SecurityContextHolder.getContext().getAuthentication().getName();
