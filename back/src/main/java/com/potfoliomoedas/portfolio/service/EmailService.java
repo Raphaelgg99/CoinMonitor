@@ -16,7 +16,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String remetente;
 
-    @Async
+    //@Async
     public void enviarEmailTexto(String destinatario, String titulo, String mensagem) {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
