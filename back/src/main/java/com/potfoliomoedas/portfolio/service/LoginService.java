@@ -50,6 +50,7 @@ public class LoginService {
     @Autowired
     private UsuarioServiceUser usuarioService;
 
+    @Transactional(readOnly = true)
     public Sessao logar(Login login) {
         Usuario usuario = repository.findByEmail(login.email())
                 .orElseThrow(() -> new InvalidCredentialsException("Credenciais inválidas"));
@@ -60,7 +61,8 @@ public class LoginService {
         }
         if (!usuario.isVerificado()) {
             usuarioService.reenviarCodigo(usuario.getEmail());
-            throw new RuntimeException("Seu email ainda não foi verificado. Verifique sua caixa de entrada.");
+            throw new RuntimeException("Seu email ainda não foi verificado. " +
+                    "Verifique sua caixa de entrada.");
         }
         System.out.println("Roles associadas ao usuário: " + usuario.getRoles());
 
