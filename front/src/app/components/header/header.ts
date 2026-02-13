@@ -2,75 +2,75 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth'; 
-import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';  
-import { UserService } from '../../services/user'; 
+import { AuthService } from '../../services/auth';
+import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { UserService } from '../../services/user';
 
 declare var bootstrap: any; // 👈 Adicione isso aqui!
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoogleSigninButtonModule, RouterModule], 
-  templateUrl: './header.html', 
+  imports: [CommonModule, FormsModule, GoogleSigninButtonModule, RouterModule],
+  templateUrl: './header.html',
   styleUrls: ['./header.css']
 })
 export class HeaderComponent implements OnInit {
 
   // Variáveis de Login e Registro
-  loginData = { email: '', senha: '' }; 
-  showPassword = false; 
+  loginData = { email: '', senha: '' };
+  showPassword = false;
   registerData = { name: '', email: '', senha: '', confirmPassword: '' };
-  
+
   // Variáveis do Perfil (Configurações)
-  userData = { nome: '', email: '', isGoogleAccount: false }; 
-  
+  userData = { nome: '', email: '', isGoogleAccount: false };
+
   // Variáveis de Edição de Senha
-  editandoSenha = false; 
-  novaSenha = '';        
-  confirmNovaSenha = '';  
+  editandoSenha = false;
+  novaSenha = '';
+  confirmNovaSenha = '';
 
   showNovaSenha = false;     // 👈 NOVO: Controla o primeiro campo
-  showConfirmSenha = false;  // 👈 NOVO: Controla o campo de confirmação 
+  showConfirmSenha = false;  // 👈 NOVO: Controla o campo de confirmação
 
   editandoNome = false;
-  nomeBackup = ''; 
+  nomeBackup = '';
 
   // 👇 NOVAS VARIÁVEIS PARA A VERIFICAÇÃO
   showVerificationStep = false; // Controla se mostra o form ou o código
-  verificationCode = '';        // Guarda o código digitado 
+  verificationCode = '';        // Guarda o código digitado
 
-  isLoading = false 
+  isLoading = false
 
   // Variáveis do Timer
   timerValue: number = 120; // 120 segundos = 2 minutos
   timerInterval: any;
-  canResend: boolean = false;  
+  canResend: boolean = false;
 
   fotoPerfilUrl: string | null = null;
 
-  
+
   constructor(
-    private authService: AuthService, 
-    public router: Router, 
-    private socialAuthService: SocialAuthService, 
-    private userService: UserService, 
+    private authService: AuthService,
+    public router: Router,
+    private socialAuthService: SocialAuthService,
+    private userService: UserService,
     private cd: ChangeDetectorRef
-  ) {}  
-  
+  ) {}
+
   // --- Lógica de Visualização ---
 
   ehPaginaDashboard(): boolean {
     return this.router.url.includes('/dashboard');
-  } 
+  }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
-  } 
-  
+  }
+
   toggleEditarNome() {
     this.editandoNome = !this.editandoNome;
-    
+
     if (this.editandoNome) {
       // 1. Entrou no modo edição: Salva o nome atual como backup
       this.nomeBackup = this.userData.nome;
@@ -90,7 +90,7 @@ export class HeaderComponent implements OnInit {
       this.showNovaSenha = false;    // 👈 NOVO
       this.showConfirmSenha = false; // 👈 NOVO
     }
-  } 
+  }
 
   // 👇👇👇 ADICIONE ESSAS DUAS FUNÇÕES NOVAS 👇👇👇
   toggleNovaSenhaVisibility() {
@@ -112,17 +112,17 @@ export class HeaderComponent implements OnInit {
   abrirConfiguracoes() {
     this.userService.getUser().subscribe({
       next: (dados: any) => {
-        console.log('Perfil carregado:', dados); 
+        console.log('Perfil carregado:', dados);
         // Mapeia os dados vindos do Java
-        this.userData.nome = dados.nome || dados.name; 
-        this.userData.email = dados.email; 
-        this.userData.isGoogleAccount = dados.isGoogleAccount;  
+        this.userData.nome = dados.nome || dados.name;
+        this.userData.email = dados.email;
+        this.userData.isGoogleAccount = dados.isGoogleAccount;
         if (dados.fotoBase64) {
             this.fotoPerfilUrl = `data:image/jpeg;base64,${dados.fotoBase64}`;
         } else {
             this.fotoPerfilUrl = null; // Garante o ícone cinza se não tiver foto
         }
-        this.cd.detectChanges(); 
+        this.cd.detectChanges();
       },
       error: (err) => {
         console.error('Erro ao buscar perfil', err);
@@ -141,30 +141,30 @@ export class HeaderComponent implements OnInit {
             alert("As senhas não coincidem!");
             return;
         }
-        if (this.novaSenha.length < 8) { 
-            alert("A nova senha deve ter no mínimo 8 caracteres."); 
-            return; 
-        } 
+        if (this.novaSenha.length < 8) {
+            alert("A nova senha deve ter no mínimo 8 caracteres.");
+            return;
+        }
 
-        if (!/[A-Z]/.test(this.novaSenha)) { 
-          alert("Precisa de letra Maiúscula."); 
-          return; 
-        }
-        if (!/[a-z]/.test(this.novaSenha)) { 
-          alert("Precisa de letra minúscula."); 
-          return; 
-        }
-        if (!/[0-9]/.test(this.novaSenha)) { 
-          alert("Precisa de número."); 
+        if (!/[A-Z]/.test(this.novaSenha)) {
+          alert("Precisa de letra Maiúscula.");
           return;
         }
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.novaSenha)) { 
-          alert("Precisa de caractere especial."); 
-          return; 
+        if (!/[a-z]/.test(this.novaSenha)) {
+          alert("Precisa de letra minúscula.");
+          return;
+        }
+        if (!/[0-9]/.test(this.novaSenha)) {
+          alert("Precisa de número.");
+          return;
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.novaSenha)) {
+          alert("Precisa de caractere especial.");
+          return;
         }
         if (!this.userData.nome || this.userData.nome.trim() === '') {
         alert('O nome não pode ficar vazio.');
-        return; 
+        return;
         }
     }
 
@@ -173,7 +173,7 @@ export class HeaderComponent implements OnInit {
         nome: this.userData.nome,
         email: this.userData.email,
         // Se estiver editando, manda a novaSenha. Se não, manda null.
-        senha: this.editandoSenha ? this.novaSenha : null 
+        senha: this.editandoSenha ? this.novaSenha : null
     };
 
     console.log('Enviando atualização:', dadosParaAtualizar);
@@ -183,15 +183,15 @@ export class HeaderComponent implements OnInit {
         next: (res) => {
             console.log('Sucesso:', res);
             alert('Perfil atualizado com sucesso!');
-            
+
             // Fecha o modal via Javascript nativo
-            document.getElementById('closeSettingsModal')?.click(); 
-            
-            
+            document.getElementById('closeSettingsModal')?.click();
+
+
             // Reseta o estado da senha
-            if (this.editandoSenha) this.toggleEditarSenha(); 
+            if (this.editandoSenha) this.toggleEditarSenha();
             if (this.editandoNome) this.editandoNome = false; // 👈 TRAVA O NOME
-            
+
             // Atualiza o nome no localStorage para refletir no Dashboard imediatamente
             localStorage.setItem('username', this.userData.nome);
         },
@@ -211,7 +211,7 @@ export class HeaderComponent implements OnInit {
          this.authService.loginGoogle(user.idToken).subscribe({
             next: (res: any) => {
                 console.log('Login Google Sucesso!', res);
-                localStorage.setItem('token', res.token); 
+                localStorage.setItem('token', res.token);
                 const nomeUsuario = res.nome || res.sessao?.nome || user.name;
                 localStorage.setItem('username', nomeUsuario);
 
@@ -232,9 +232,10 @@ export class HeaderComponent implements OnInit {
         alert('Preencha todos os campos!');
         return;
       }
+    this.isLoading = true;
       this.authService.login(this.loginData).subscribe({
         next: (res) => {
-            // ... (seu código de sucesso atual) ...
+            this.isLoading = false;
             document.getElementById('closeLoginModal')?.click();
             this.router.navigate(['/dashboard']);
         },
@@ -244,7 +245,7 @@ export class HeaderComponent implements OnInit {
 
           // 👇 Verifica se é o caso da conta não verificada
           if (mensagemErro.includes("Seu email ainda não foi verificado")) {
-              
+
               alert(mensagemErro); // "Um novo código foi enviado..."
 
               // 1. Fecha o Modal de Login
@@ -261,9 +262,9 @@ export class HeaderComponent implements OnInit {
               setTimeout(() => {
                   const registerModal = new bootstrap.Modal(document.getElementById('registerModal')!);
                   registerModal.show();
-                  
+
                   // Inicia o timer do código novo que acabou de ser enviado
-                  this.iniciarTimer(); 
+                  this.iniciarTimer();
               }, 500);
 
           } else {
@@ -274,7 +275,7 @@ export class HeaderComponent implements OnInit {
       });
   }
 
-  onRegister() { 
+  onRegister() {
     // Validações
     const emailPadrao = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (this.registerData.senha !== this.registerData.confirmPassword) {
@@ -282,32 +283,32 @@ export class HeaderComponent implements OnInit {
     }
     if (!this.registerData.name || !this.registerData.email || !this.registerData.senha) {
       alert('Preencha todos os campos!'); return;
-    } 
+    }
     if (!emailPadrao.test(this.registerData.email)) {
-        alert("Digite um e-mail válido."); return; 
-    } 
+        alert("Digite um e-mail válido."); return;
+    }
     // Validações de força de senha
-    if (this.registerData.senha.length < 8) { alert("Mínimo 8 caracteres."); return; } 
+    if (this.registerData.senha.length < 8) { alert("Mínimo 8 caracteres."); return; }
     if (!/[A-Z]/.test(this.registerData.senha)) { alert("Precisa de letra Maiúscula."); return; }
     if (!/[a-z]/.test(this.registerData.senha)) { alert("Precisa de letra minúscula."); return; }
     if (!/[0-9]/.test(this.registerData.senha)) { alert("Precisa de número."); return; }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.registerData.senha)) { alert("Precisa de caractere especial."); return; } 
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.registerData.senha)) { alert("Precisa de caractere especial."); return; }
 
     this.isLoading = true;
 
     this.authService.register(this.registerData).subscribe({
       next: (res) => {
         console.log('Pré-registro feito! Aguardando verificação.', res);
-        
-      this.showVerificationStep = true;  
-      this.isLoading = false; 
+
+      this.showVerificationStep = true;
+      this.isLoading = false;
 
       this.iniciarTimer();
       this.cd.detectChanges();
       },
       error: (err) => {
         const msg = err.error?.message || 'Erro ao criar conta.';
-        alert(msg); 
+        alert(msg);
         this.isLoading = false;
       }
     });
@@ -329,19 +330,19 @@ export class HeaderComponent implements OnInit {
     this.authService.verifyEmail(payload).subscribe({
         next: (res) => {
             alert('Conta verificada com sucesso!');
-            
+
             // Agora sim fazemos o Login Automático
-            const loginPayload = { 
-                email: this.registerData.email, 
-                senha: this.registerData.senha 
+            const loginPayload = {
+                email: this.registerData.email,
+                senha: this.registerData.senha
             };
-            
+
             this.authService.login(loginPayload).subscribe({
                  next: () => {
                      document.getElementById('closeRegisterModal')?.click();
                      this.router.navigate(['/dashboard']);
                      // Reseta o estado para a próxima vez
-                     this.showVerificationStep = false; 
+                     this.showVerificationStep = false;
                      this.verificationCode = '';
                  }
             });
@@ -350,19 +351,19 @@ export class HeaderComponent implements OnInit {
             alert('Código incorreto ou expirado!');
         }
     });
-  } 
+  }
 
   // Inicia ou Reinicia o Relógio
 iniciarTimer() {
   this.timerValue = 20; // Reseta para 2 minutos
   this.canResend = false; // Trava o botão
-  
+
   // Limpa timer anterior para não encavalar
   if (this.timerInterval) clearInterval(this.timerInterval);
 
   this.timerInterval = setInterval(() => {
     if (this.timerValue > 0) {
-      this.timerValue--; 
+      this.timerValue--;
       this.cd.detectChanges();
     } else {
       // Tempo acabou! Libera o botão
@@ -384,7 +385,7 @@ onReenviar() {
   if (!this.canResend) return; // Segurança extra
 
   this.isLoading = true; // Trava para não clicar mil vezes
-  
+
   this.authService.resendCode(this.registerData.email).subscribe({
     next: (res) => {
       alert('Novo código enviado com sucesso!');
@@ -398,7 +399,7 @@ onReenviar() {
       this.cd.detectChanges();
     }
   });
-} 
+}
 
 onFileSelected(event: any) {
     const file: File = event.target.files[0];
@@ -422,7 +423,7 @@ enviarFotoParaService(file: File) {
             // SUCESSO: Atualiza o preview na tela
             const reader = new FileReader();
             reader.onload = (e: any) => {
-                this.fotoPerfilUrl = e.target.result; 
+                this.fotoPerfilUrl = e.target.result;
                 this.cd.detectChanges();
             };
             reader.readAsDataURL(file);
@@ -434,7 +435,7 @@ enviarFotoParaService(file: File) {
             alert('Erro ao enviar a foto. Tente novamente.');
         }
     });
-  }  
+  }
 
   deletarPerfil(){
     // 1. Pergunta de Segurança (Evita cliques acidentais)
@@ -450,7 +451,7 @@ enviarFotoParaService(file: File) {
                 document.getElementById('closeSettingsModal')?.click();
 
                 // 3. 👇 O PULO DO GATO: Faz Logout imediato!
-                this.logout(); 
+                this.logout();
             },
             error: (err) => {
                 console.error('Erro ao deletar:', err);
@@ -459,7 +460,7 @@ enviarFotoParaService(file: File) {
             }
         });
     }
-      
+
   }
 
 }
