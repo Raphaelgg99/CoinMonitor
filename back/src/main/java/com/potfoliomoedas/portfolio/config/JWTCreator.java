@@ -24,11 +24,9 @@ public class JWTCreator {
                 .setIssuedAt(jwtObject.getIssuedAt())
                 .setExpiration(jwtObject.getExpiration())
                 .claim(ROLES_AUTHORITIES, rolesAsString)
-                // 4. Use a config injetada (com getter)
                 .signWith(SignatureAlgorithm.HS512, securityConfig.getKEY())
                 .compact();
 
-        // 5. Use a config injetada (com getter)
         return securityConfig.getPREFIX() + " " + token;
     }
 
@@ -56,7 +54,7 @@ public class JWTCreator {
 
     private List<String> checkRoles(List<String> roles) {
         return roles.stream()
-                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)  // Adiciona "ROLE_" somente se não existir
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
                 .collect(Collectors.toList());
     }
 

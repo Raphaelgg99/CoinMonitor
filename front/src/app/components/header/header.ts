@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth';
 import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 import { UserService } from '../../services/user';
 
-declare var bootstrap: any; // 👈 Adicione isso aqui!
+declare var bootstrap: any; //
 
 @Component({
   selector: 'app-header',
@@ -17,33 +17,29 @@ declare var bootstrap: any; // 👈 Adicione isso aqui!
 })
 export class HeaderComponent implements OnInit {
 
-  // Variáveis de Login e Registro
+
   loginData = { email: '', senha: '' };
   showPassword = false;
   registerData = { name: '', email: '', senha: '', confirmPassword: '' };
 
-  // Variáveis do Perfil (Configurações)
   userData = { nome: '', email: '', isGoogleAccount: false };
 
-  // Variáveis de Edição de Senha
   editandoSenha = false;
   novaSenha = '';
   confirmNovaSenha = '';
 
-  showNovaSenha = false;     // 👈 NOVO: Controla o primeiro campo
-  showConfirmSenha = false;  // 👈 NOVO: Controla o campo de confirmação
+  showNovaSenha = false;
+  showConfirmSenha = false;
 
   editandoNome = false;
   nomeBackup = '';
 
-  // 👇 NOVAS VARIÁVEIS PARA A VERIFICAÇÃO
-  showVerificationStep = false; // Controla se mostra o form ou o código
-  verificationCode = '';        // Guarda o código digitado
+  showVerificationStep = false;
+  verificationCode = '';
 
   isLoading = false
 
-  // Variáveis do Timer
-  timerValue: number = 120; // 120 segundos = 2 minutos
+  timerValue: number = 120;
   timerInterval: any;
   canResend: boolean = false;
 
@@ -58,7 +54,6 @@ export class HeaderComponent implements OnInit {
     private cd: ChangeDetectorRef
   ) {}
 
-  // --- Lógica de Visualização ---
 
   ehPaginaDashboard(): boolean {
     return this.router.url.includes('/dashboard');
@@ -72,27 +67,22 @@ export class HeaderComponent implements OnInit {
     this.editandoNome = !this.editandoNome;
 
     if (this.editandoNome) {
-      // 1. Entrou no modo edição: Salva o nome atual como backup
       this.nomeBackup = this.userData.nome;
     } else {
-      // 2. Cancelou: Restaura o nome original
       this.userData.nome = this.nomeBackup;
     }
   }
 
  toggleEditarSenha() {
     this.editandoSenha = !this.editandoSenha;
-    // Se cancelou (editandoSenha virou false), limpa os campos
     if (!this.editandoSenha) {
       this.novaSenha = '';
       this.confirmNovaSenha = '';
-      // Reseta a visibilidade por segurança
-      this.showNovaSenha = false;    // 👈 NOVO
-      this.showConfirmSenha = false; // 👈 NOVO
+      this.showNovaSenha = false;
+      this.showConfirmSenha = false;
     }
   }
 
-  // 👇👇👇 ADICIONE ESSAS DUAS FUNÇÕES NOVAS 👇👇👇
   toggleNovaSenhaVisibility() {
     this.showNovaSenha = !this.showNovaSenha;
   }
@@ -106,8 +96,6 @@ export class HeaderComponent implements OnInit {
     localStorage.removeItem('username');
     this.router.navigate(['/login']);
   }
-
-  // --- Lógica do Modal de Configurações ---
 
   abrirConfiguracoes() {
     this.userService.getUser().subscribe({
@@ -131,7 +119,6 @@ export class HeaderComponent implements OnInit {
   }
 
   salvarPerfil() {
-    // 1. Validação de Senha (apenas se estiver editando)
     if (this.editandoSenha) {
         if (!this.novaSenha || !this.confirmNovaSenha) {
             alert("Por favor, preencha a senha e a confirmação.");
@@ -168,31 +155,20 @@ export class HeaderComponent implements OnInit {
         }
     }
 
-    // 2. Monta o objeto para enviar ao Backend
     const dadosParaAtualizar = {
         nome: this.userData.nome,
         email: this.userData.email,
-        // Se estiver editando, manda a novaSenha. Se não, manda null.
         senha: this.editandoSenha ? this.novaSenha : null
     };
 
     console.log('Enviando atualização:', dadosParaAtualizar);
-
-    // 3. Chama o Serviço
     this.userService.update(dadosParaAtualizar).subscribe({
         next: (res) => {
             console.log('Sucesso:', res);
             alert('Perfil atualizado com sucesso!');
-
-            // Fecha o modal via Javascript nativo
             document.getElementById('closeSettingsModal')?.click();
-
-
-            // Reseta o estado da senha
             if (this.editandoSenha) this.toggleEditarSenha();
-            if (this.editandoNome) this.editandoNome = false; // 👈 TRAVA O NOME
-
-            // Atualiza o nome no localStorage para refletir no Dashboard imediatamente
+            if (this.editandoNome) this.editandoNome = false;
             localStorage.setItem('username', this.userData.nome);
         },
         error: (err) => {
@@ -202,8 +178,6 @@ export class HeaderComponent implements OnInit {
         }
     });
   }
-
-  // --- Lógica de Inicialização e Auth (Mantida igual) ---
 
   ngOnInit() {
       this.socialAuthService.authState.subscribe((user) => {
@@ -240,35 +214,25 @@ export class HeaderComponent implements OnInit {
             this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          // Pega a mensagem de erro que veio do Java
           const mensagemErro = err.error?.message || 'Erro ao fazer login';
 
-          // 👇 Verifica se é o caso da conta não verificada
           if (mensagemErro.includes("Seu email ainda não foi verificado")) {
 
-              alert(mensagemErro); // "Um novo código foi enviado..."
-
-              // 1. Fecha o Modal de Login
+              alert(mensagemErro);
               document.getElementById('closeLoginModal')?.click();
 
-              // 2. Prepara os dados para a tela de verificação
-              // (Importante: passa o email que ele tentou logar para o formulário de validação)
               this.registerData.email = this.loginData.email;
               this.showVerificationStep = true;
-              this.verificationCode = ''; // Limpa código anterior
+              this.verificationCode = '';
 
-              // 3. Abre o Modal de Registro (onde fica a verificação)
-              // Precisamos de um pequeno delay para a troca de modais ficar suave
               setTimeout(() => {
                   const registerModal = new bootstrap.Modal(document.getElementById('registerModal')!);
                   registerModal.show();
 
-                  // Inicia o timer do código novo que acabou de ser enviado
                   this.iniciarTimer();
               }, 500);
 
           } else {
-              // Erro comum (senha errada, etc)
               alert(mensagemErro);
           }
         }
@@ -314,7 +278,6 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  // 👇 NOVA FUNÇÃO: CHAMADA QUANDO CLICA EM "VALIDAR CÓDIGO"
   onVerifyCode() {
     if (this.verificationCode.length < 4) {
       alert('Código inválido.');
@@ -325,13 +288,10 @@ export class HeaderComponent implements OnInit {
         email: this.registerData.email,
         codigo: this.verificationCode
     };
-
-    // Você precisará criar esse método 'verifyEmail' no seu AuthService
     this.authService.verifyEmail(payload).subscribe({
         next: (res) => {
             alert('Conta verificada com sucesso!');
 
-            // Agora sim fazemos o Login Automático
             const loginPayload = {
                 email: this.registerData.email,
                 senha: this.registerData.senha
@@ -353,12 +313,10 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  // Inicia ou Reinicia o Relógio
 iniciarTimer() {
-  this.timerValue = 20; // Reseta para 2 minutos
-  this.canResend = false; // Trava o botão
+  this.timerValue = 20;
+  this.canResend = false;
 
-  // Limpa timer anterior para não encavalar
   if (this.timerInterval) clearInterval(this.timerInterval);
 
   this.timerInterval = setInterval(() => {
@@ -366,30 +324,27 @@ iniciarTimer() {
       this.timerValue--;
       this.cd.detectChanges();
     } else {
-      // Tempo acabou! Libera o botão
       this.canResend = true;
       clearInterval(this.timerInterval);
     }
   }, 1000);
 }
 
-// Formata os segundos para "01:59" (Bonito na tela)
 get tempoFormatado() {
   const min = Math.floor(this.timerValue / 60);
   const sec = this.timerValue % 60;
   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 }
 
-// Ação do botão "Reenviar"
 onReenviar() {
-  if (!this.canResend) return; // Segurança extra
+  if (!this.canResend) return;
 
-  this.isLoading = true; // Trava para não clicar mil vezes
+  this.isLoading = true;
 
   this.authService.resendCode(this.registerData.email).subscribe({
     next: (res) => {
       alert('Novo código enviado com sucesso!');
-      this.iniciarTimer(); // Reinicia a contagem
+      this.iniciarTimer();
       this.isLoading = false;
       this.cd.detectChanges();
     },
@@ -405,22 +360,18 @@ onFileSelected(event: any) {
     const file: File = event.target.files[0];
 
     if (file) {
-        if (file.size > 5 * 1024 * 1024) { // Limite de 5MB
+        if (file.size > 5 * 1024 * 1024) {
             alert('A imagem deve ter no máximo 5MB');
             return;
         }
 
-        // Chama o envio
         this.enviarFotoParaService(file);
     }
 }
 
-// 2. Método que chama o Service
 enviarFotoParaService(file: File) {
-    // Usa o authService que já está injetado no construtor
     this.userService.uploadFoto(file).subscribe({
         next: (res) => {
-            // SUCESSO: Atualiza o preview na tela
             const reader = new FileReader();
             reader.onload = (e: any) => {
                 this.fotoPerfilUrl = e.target.result;
@@ -438,7 +389,6 @@ enviarFotoParaService(file: File) {
   }
 
   deletarPerfil(){
-    // 1. Pergunta de Segurança (Evita cliques acidentais)
     const confirmacao = confirm("Tem certeza que deseja excluir sua conta permanentemente? Essa ação não pode ser desfeita.");
 
     if (confirmacao) {
@@ -447,10 +397,8 @@ enviarFotoParaService(file: File) {
                 console.log('Sucesso:', res);
                 alert('Sua conta foi excluída com sucesso.');
 
-                // 2. Fecha o modal
                 document.getElementById('closeSettingsModal')?.click();
 
-                // 3. 👇 O PULO DO GATO: Faz Logout imediato!
                 this.logout();
             },
             error: (err) => {

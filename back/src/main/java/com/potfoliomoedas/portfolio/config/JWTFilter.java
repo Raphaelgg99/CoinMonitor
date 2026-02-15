@@ -37,8 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         try {
             if (token != null && !token.isEmpty()) {
-                // 3. Use o creator NÃO-ESTÁTICO que veio pelo construtor
-                JWTObject tokenObject = jwtCreator.parseToken(token); // Use o método renomeado
+                JWTObject tokenObject = jwtCreator.parseToken(token);
 
                 List<SimpleGrantedAuthority> authorities = authorities(tokenObject.getRoles());
                 UsernamePasswordAuthenticationToken userToken =

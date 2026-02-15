@@ -10,12 +10,9 @@ import java.net.http.HttpResponse;
 @Service
 public class EmailService {
 
-    // AQUI ESTÁ A MUDANÇA MÁGICA:
-    // O Spring vai buscar essa chave lá nas variáveis do Render
     @Value("${BREVO_API_KEY}")
     private String apiKey;
 
-    // Remetente (Pode ficar fixo ou virar variavel também, mas fixo não é perigoso)
     private final String REMETENTE_EMAIL = "raphaelprix99@gmail.com";
     private final String REMETENTE_NOME = "CoinMonitor";
 

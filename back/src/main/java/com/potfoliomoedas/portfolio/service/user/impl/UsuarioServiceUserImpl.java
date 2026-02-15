@@ -62,28 +62,21 @@ public class UsuarioServiceUserImpl implements UsuarioServiceUser {
         novoUsuario.setSenha(encoder.encode(requestDTO.senha()));
         novoUsuario.setVerificado(false); // Inativo
         gerarEEnviarCodigo(novoUsuario);
-        // 3. Gera o Código
         return convertToDTO.convertUserToUserDTO(novoUsuario);
     }
 
     public void salvarFoto(MultipartFile file) throws IOException {
         Usuario usuario = usuarioLogado.getUsuarioLogado();
-        // Converte o arquivo recebido para bytes e salva no usuario
         usuario.setFotoPerfil(file.getBytes());
         usuarioRepository.save(usuario);
     }
 
     private void gerarEEnviarCodigo(Usuario usuario){
         String codigo = String.valueOf(new Random().nextInt(900000) + 100000);
-
-        // Atualiza o usuário
         usuario.setCodigoVerificacao(codigo);
         usuario.setValidadeCodigo(LocalDateTime.now().plusMinutes(15));
 
-        // Salva no banco (Importante salvar antes de enviar)
         usuarioRepository.save(usuario);
-
-        // Envia o Email (Assíncrono)
         emailService.enviarEmailTexto(
                 usuario.getEmail(),
                 "Código de Verificação - CoinMonitor",
@@ -111,7 +104,6 @@ public class UsuarioServiceUserImpl implements UsuarioServiceUser {
             return;
         }
 
-        // 👇 AJUSTE AQUI: Adicione o .trim() para evitar espaços invisíveis
         if (usuario.getCodigoVerificacao().equals(dados.codigo().trim()) &&
                 LocalDateTime.now().isBefore(usuario.getValidadeCodigo())) {
 
@@ -121,7 +113,6 @@ public class UsuarioServiceUserImpl implements UsuarioServiceUser {
 
             usuarioRepository.save(usuario);
         } else {
-            // Dica de Debug: Se cair aqui, o print vai te mostrar no console quem é quem
             System.out.println("ERRO VERIFICACAO: Banco[" + usuario.getCodigoVerificacao() + "] vs Digitado[" + dados.codigo() + "]");
             System.out.println("Validade: " + usuario.getValidadeCodigo() + " vs Agora: " + LocalDateTime.now());
 

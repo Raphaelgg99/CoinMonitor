@@ -25,7 +25,6 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<Object> logar(@RequestBody Login login){
         try {
-            // Tenta logar
             Sessao sessao = loginService.logar(login);
             return ResponseEntity.ok(sessao);
 
@@ -38,12 +37,10 @@ public class LoginController {
     public ResponseEntity<Sessao> loginGoogle(@RequestBody GoogleLoginDTO body)
             throws GeneralSecurityException, IOException {
         try {
-            // Chama o serviço que faz toda a mágica (valida, cria user, gera token)
             Sessao sessao = loginService.logarComGoogle(body.token);
             return ResponseEntity.ok(sessao);
         }
         catch (Exception e) {
-            // Se o token for falso ou der erro, retorna 400 Bad Request
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }

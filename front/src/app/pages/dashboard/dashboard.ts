@@ -1,8 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 
-// 👇 1. IMPORTAÇÕES DO GRÁFICO (APEXCHARTS)
 import {
   NgApexchartsModule,
   ApexAxisChartSeries,
@@ -18,7 +17,6 @@ import {
 import { CarteiraService } from '../../services/carteira';
 import { CarteiraResponse } from '../../models/carteira.model';
 
-// Definição do Tipo para o Gráfico
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -34,43 +32,41 @@ export type ChartOptions = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  // 👇 2. O MÓDULO DO GRÁFICO ENTRA AQUI
   imports: [CommonModule, FormsModule, NgApexchartsModule],
-  templateUrl: './dashboard.html', // Verifique se o nome é dashboard.html ou dashboard.component.html
-  styleUrls: ['./dashboard.css'] // Verifique se é css ou scss
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.css']
 })
-export class DashboardComponent implements OnInit { 
+export class DashboardComponent implements OnInit {
 
-  moedaSelecionada: 'BRL' | 'USD' | 'EUR' = 'BRL'; 
+  moedaSelecionada: 'BRL' | 'USD' | 'EUR' = 'BRL';
 
   sugestoesMoedas: any[] = [];
   mostrandoSugestoes: boolean = false;
 
   carteira: CarteiraResponse | null = null;
-  isLoading = true;  
-  
-  // Variáveis do Formulário do Modal
+  isLoading = true;
+
   novaMoedaId: string = '';
-  novaMoedaQtd: number | null = null;  
+  novaMoedaQtd: number | null = null;
   novaMoedaLogo: string = '';
 
   // Variáveis para controle de Modais
-  moedaParaExcluir: string | null = null; 
+  moedaParaExcluir: string | null = null;
   moedaParaEditar: string | null = null;
   qtdParaEditar: number | null = null;
 
   // === VARIÁVEIS DO GRÁFICO 📊 ===
   public chartOptions: Partial<ChartOptions> | any;
   public moedaGraficoId: string = '';
-  public carregandoGrafico: boolean = false; 
-  public periodoSelecionado: string = '7'; 
+  public carregandoGrafico: boolean = false;
+  public periodoSelecionado: string = '7';
   mostrarAvisoPrecos: boolean = true;
 
   constructor(
-    private carteiraService: CarteiraService, 
+    private carteiraService: CarteiraService,
     private cdr: ChangeDetectorRef
   ) {
-    // === CONFIGURAÇÃO INICIAL DO GRÁFICO (DARK MODE) ===
+
     this.chartOptions = {
       series: [],
       chart: {
@@ -80,15 +76,15 @@ export class DashboardComponent implements OnInit {
         toolbar: { show: false }
       },
       dataLabels: { enabled: false },
-      stroke: { curve: "smooth", width: 2, colors: ['#0dcaf0'] }, // Azul Ciano
+      stroke: { curve: "smooth", width: 2, colors: ['#0dcaf0'] },
       xaxis: {
         type: "datetime",
         labels: { style: { colors: '#fff' } }
       },
       yaxis: {
-        labels: { 
+        labels: {
           style: { colors: '#fff' },
-          formatter: (value: number) => { return "R$ " + value.toFixed(2) } 
+          formatter: (value: number) => { return "R$ " + value.toFixed(2) }
         }
       },
       tooltip: { theme: 'dark' },
@@ -107,7 +103,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.carregarDados();
-  } 
+  }
 
   fecharAviso() {
     this.mostrarAvisoPrecos = false;
@@ -119,20 +115,20 @@ export class DashboardComponent implements OnInit {
         console.log('✅ Dados recebidos, atualizando tela...');
         this.carteira = dados;
         this.isLoading = false;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Erro:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
       }
-    }); 
-  } 
+    });
+  }
 
   abrirGrafico(coinId: string) {
     this.moedaGraficoId = coinId;
-    this.periodoSelecionado = '7'; // Começa sempre com 7 dias
-    this.carregarGraficoComPeriodo(this.periodoSelecionado); // Chama a função nova
+    this.periodoSelecionado = '7';
+    this.carregarGraficoComPeriodo(this.periodoSelecionado);
   }
 
   carregarGraficoComPeriodo(dias: string) {
@@ -140,30 +136,26 @@ export class DashboardComponent implements OnInit {
     this.carregandoGrafico = true;
     this.chartOptions.series = [];
 
-    // 1. Descobre qual símbolo usar no gráfico
     let simbolo = 'R$ ';
     if (this.moedaSelecionada === 'USD') simbolo = '$ ';
     if (this.moedaSelecionada === 'EUR') simbolo = '€ ';
 
-    // 2. Atualiza a formatação do Eixo Y dinamicamente
     this.chartOptions.yaxis = {
-        labels: { 
+        labels: {
           style: { colors: '#fff' },
-          formatter: (value: number) => { return simbolo + value.toFixed(2) } 
+          formatter: (value: number) => { return simbolo + value.toFixed(2) }
         }
     };
 
-    // 3. Chama o serviço passando a moeda selecionada (BRL, USD ou EUR)
     this.carteiraService.buscarHistorico(this.moedaGraficoId, dias, this.moedaSelecionada)
       .subscribe({
         next: (dados) => {
           this.chartOptions.series = [{
-            name: `Preço (${this.moedaSelecionada})`, // Ex: Preço (USD)
+            name: `Preço (${this.moedaSelecionada})`,
             data: dados
           }];
           this.carregandoGrafico = false;
-          // Força atualização das opções do gráfico para pegar o novo símbolo
-          this.chartOptions = { ...this.chartOptions }; 
+          this.chartOptions = { ...this.chartOptions };
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -173,7 +165,6 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  // --- ADICIONAR MOEDA ---
   adicionarMoeda() {
     if (!this.novaMoedaId || !this.novaMoedaQtd) {
       alert('Preencha todos os campos!');
@@ -184,9 +175,9 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: () => {
           alert('Moeda adicionada com sucesso! 🚀\n\nNota: Se o preço aparecer zerado, aguarde cerca de 5 minutos para a atualização automática.');
-    
+
           this.novaMoedaId = '';
-          this.novaMoedaQtd = null; 
+          this.novaMoedaQtd = null;
           this.novaMoedaLogo = '';
 
           const btnFechar = document.getElementById('fecharModalBtn');
@@ -200,9 +191,8 @@ export class DashboardComponent implements OnInit {
           alert('Erro ao adicionar moeda. Verifique o ID (ex: bitcoin).');
         }
       });
-  } 
+  }
 
-  // --- EXCLUIR MOEDA ---
   prepararExclusao(coinId: string) {
     this.moedaParaExcluir = coinId;
   }
@@ -212,10 +202,10 @@ export class DashboardComponent implements OnInit {
       this.carteiraService.deletarMoeda(this.moedaParaExcluir).subscribe({
         next: () => {
           this.carregarDados();
-          
+
           const btnFechar = document.getElementById('fecharModalExclusaoBtn');
           btnFechar?.click();
-          
+
           this.moedaParaExcluir = null;
         },
         error: (err) => {
@@ -224,12 +214,11 @@ export class DashboardComponent implements OnInit {
         }
       });
     }
-  } 
-  
-  // --- EDITAR QUANTIDADE ---
+  }
+
   prepararEdicao(moeda: any) {
     this.moedaParaEditar = moeda.coinId;
-    this.qtdParaEditar = moeda.quantidade; 
+    this.qtdParaEditar = moeda.quantidade;
   }
 
   confirmarEdicao() {
@@ -238,10 +227,10 @@ export class DashboardComponent implements OnInit {
         .subscribe({
           next: () => {
             alert('Quantidade atualizada com sucesso!');
-            
+
             const btnFechar = document.getElementById('fecharModalEdicaoBtn');
             btnFechar?.click();
-            
+
             this.carregarDados();
           },
           error: (err) => {
@@ -250,16 +239,15 @@ export class DashboardComponent implements OnInit {
           }
         });
     }
-  } 
+  }
 
-  // --- AUTOCOMPLETE ---
   buscarSugestoes(evento: any) {
     const query = evento.target.value;
 
     if (query.length > 0) {
       this.carteiraService.buscarMoedasCoinGecko(query).subscribe({
         next: (res: any) => {
-          this.sugestoesMoedas = res || []; 
+          this.sugestoesMoedas = res || [];
           this.mostrandoSugestoes = true;
         },
         error: (err) => {
@@ -270,12 +258,12 @@ export class DashboardComponent implements OnInit {
       this.sugestoesMoedas = [];
       this.mostrandoSugestoes = false;
     }
-  } 
+  }
 
   selecionarSugestao(moeda: any) {
-    this.novaMoedaId = moeda.id; 
-    this.mostrandoSugestoes = false; 
-    this.novaMoedaLogo = moeda.thumb; 
+    this.novaMoedaId = moeda.id;
+    this.mostrandoSugestoes = false;
+    this.novaMoedaLogo = moeda.thumb;
   }
 
   esconderSugestoes() {

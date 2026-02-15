@@ -20,13 +20,13 @@ public class UsuarioControllerAdvice {
 
     @ExceptionHandler({EmailNullException.class, NomeNullException.class, SenhaNullException.class})
     public ResponseEntity<ApiErrorResponse> handleValidacaoManual(
-            RuntimeException ex, HttpServletRequest request) { // Pega qualquer uma das 3
+            RuntimeException ex, HttpServletRequest request) {
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(), // 400
-                HttpStatus.BAD_REQUEST.getReasonPhrase(), // "Bad Request"
-                ex.getMessage(), // "Email não pode ser vazio", "Nome não pode ser vazio", etc.
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -38,9 +38,9 @@ public class UsuarioControllerAdvice {
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.CONFLICT.value(), // 409
-                HttpStatus.CONFLICT.getReasonPhrase(), // "Conflict"
-                ex.getMessage(), // "Email já existente"
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -52,10 +52,10 @@ public class UsuarioControllerAdvice {
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(), // 404
-                HttpStatus.NOT_FOUND.getReasonPhrase(), // "Not Found"
-                ex.getMessage(), // A mensagem que você definiu ("Usuario não encontrado")
-                request.getRequestURI() // O path (ex: "/usuario/99")
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
@@ -66,7 +66,7 @@ public class UsuarioControllerAdvice {
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(), // 401
+                HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 ex.getMessage(),
                 request.getRequestURI()
@@ -80,9 +80,9 @@ public class UsuarioControllerAdvice {
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.UNAUTHORIZED.value(), // 401
-                HttpStatus.UNAUTHORIZED.getReasonPhrase(), // "Unauthorized"
-                ex.getMessage(), // "Credenciais inválidas"
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -92,14 +92,13 @@ public class UsuarioControllerAdvice {
     public ResponseEntity<ApiErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
 
-        // IMPORTANTE: Logue o erro real no console para você (desenvolvedor)
         System.err.println("Erro inesperado: " + ex.getMessage());
-        ex.printStackTrace(); // Para debugging
+        ex.printStackTrace();
 
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(), // 500
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), // "Internal Server Error"
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "Ocorreu um erro inesperado no servidor. Contate o administrador.",
                 request.getRequestURI()
         );

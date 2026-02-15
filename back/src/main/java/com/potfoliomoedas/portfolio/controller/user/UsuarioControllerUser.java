@@ -30,17 +30,14 @@ public class UsuarioControllerUser {
 
     @PostMapping("/criarusuario")
     public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody UsuarioRequestDTO requestDTO) {
-        // 1. Crie o usuário e pegue o DTO de resposta
         UsuarioResponseDTO usuarioCriado = usuarioService.criarUsuario(requestDTO);
 
-        // 2. Construa a URI para o novo usuário (ex: http://localhost:8080/usuario/11)
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest() // Pega a URL atual ("/usuario/adicionar")
-               .path("/{id}")        // Adiciona "/{id}"
-                .buildAndExpand(usuarioCriado.id()) // Substitui o {id} pelo ID do usuário
-                .toUri();             // Converte para URI
+                .fromCurrentRequest()
+               .path("/{id}")
+                .buildAndExpand(usuarioCriado.id())
+                .toUri();
 
-        // 3. Retorne 201 Created, com a URI no cabeçalho Location e o DTO no corpo
         return ResponseEntity.created(location).body(usuarioCriado);
     }
 

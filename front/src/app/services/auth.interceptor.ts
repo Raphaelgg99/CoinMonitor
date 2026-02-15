@@ -16,28 +16,20 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private router: Router) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    
-    // Deixa a requisição passar e observa a resposta
+
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        
-        // Se o erro for 403 (Proibido) ou 401 (Não autorizado)
-        // Significa que o token é inválido ou expirou
+
         if (error.status === 403 || error.status === 401) {
             console.warn('Token expirado ou inválido. Deslogando...');
-            
-            // 1. Limpa o token vencido do navegador
             localStorage.removeItem('token');
-            localStorage.removeItem('username'); // ou qualquer outro dado
-            
-            // 2. Chuta o usuário para a Home (Login)
-            this.router.navigate(['/']); 
-            
-            // Opcional: Fechar modais abertos se tiver usando Bootstrap via JS
+            localStorage.removeItem('username');
+
+            this.router.navigate(['/']);
+
             document.getElementById('closeSettingsModal')?.click();
         }
 
-        // Passa o erro para frente (caso o componente queira mostrar algum alerta)
         return throwError(() => error);
       })
     );

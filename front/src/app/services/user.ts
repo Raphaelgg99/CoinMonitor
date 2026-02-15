@@ -13,10 +13,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(): Observable<UsuarioResponseDTO> {
-      // Pega o token salvo
       const token = localStorage.getItem('token');
-
-      // Monta o cabeçalho com o Token
       const headers = new HttpHeaders({
         'Authorization': `Bearer ${token}`
       });
@@ -32,32 +29,25 @@ export class UserService {
         'Authorization': `Bearer ${token}`
       });
 
-    // Payload que o Java espera
     const payload = {
-      nome: usuarioEditado.nome,    // <--- Corrigido de .name para .nome
+      nome: usuarioEditado.nome,
       email: usuarioEditado.email,
-      senha: usuarioEditado.senha   // Se vier vazio, o Java deve ignorar
+      senha: usuarioEditado.senha
     };
 
     return this.http.put(`${this.apiUrl}`,  payload, { headers })
   }
 
-  // Adicione este método no seu AuthService (ou UsuarioService)
 uploadFoto(file: File): Observable<any> {
   const formData = new FormData();
   formData.append('file', file);
 
   const token = localStorage.getItem('token');
 
-    // ⚠️ SEGREDINHO:
-    // Criamos o header SÓ com o Authorization.
-    // Não coloque 'Content-Type': 'multipart/form-data', senão quebra o envio do arquivo!
     const headers = new HttpHeaders({
         'Authorization': `Bearer ${token}`
     });
 
-  // Ajuste a rota '/usuario/foto' conforme seu Controller no Java
-  // Se o seu Controller não tiver @RequestMapping("/usuario"), use apenas '/foto'
   return this.http.post(`${this.apiUrl}/foto`, formData, {headers});
 }
 

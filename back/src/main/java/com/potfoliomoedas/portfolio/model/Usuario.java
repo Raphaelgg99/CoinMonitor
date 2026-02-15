@@ -28,9 +28,9 @@ public class Usuario {
     private String senha;
 
     @OneToMany(
-            mappedBy = "usuario", // Mapeado pelo campo "usuario" na classe Moeda
-            cascade = CascadeType.ALL, // Se apagar o usuário, apaga as moedas
-            orphanRemoval = true // Remove moedas órfãs
+            mappedBy = "usuario",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Moeda> carteira = new ArrayList<>();
 
@@ -39,8 +39,8 @@ public class Usuario {
     @Column(name = "role_id")
     private List<String> roles = new ArrayList<>();
 
-    @Lob // Avisa ao banco que é um arquivo grande (BLOB)
-    @Column(length = 10000000) // Garante espaço (ex: até 10MB, mas vamos limitar antes)
+    @Lob
+    @Column(length = 10000000)
     private byte[] fotoPerfil;
 
     @Column(nullable = false)

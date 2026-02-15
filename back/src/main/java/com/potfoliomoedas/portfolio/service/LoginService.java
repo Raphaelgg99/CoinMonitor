@@ -112,7 +112,6 @@ public class LoginService {
             jwtObject.setRoles(usuario.getRoles());
             jwtObject.setSubject(usuario.getEmail());
 
-            // 4. Gera o Token do seu sistema (JWT)
             String token = jwtCreator.gerarToken(jwtObject);
 
             return new Sessao(usuario.getEmail(), token);
@@ -121,7 +120,6 @@ public class LoginService {
         }
     }
 
-    // 2. Crie esse método NOVO no final da classe (pode ser protected para o teste ver)
     protected GoogleIdToken validarTokenNoGoogle(String token) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(googleClientId))

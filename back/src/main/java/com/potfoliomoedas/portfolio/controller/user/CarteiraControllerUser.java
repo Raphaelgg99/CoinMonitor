@@ -14,7 +14,7 @@ import java.util.List;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("usuario/carteira") // Rota base (ex: /portfolio/adicionar)
+@RequestMapping("usuario/carteira")
 public class CarteiraControllerUser {
 
     @Autowired
@@ -26,14 +26,11 @@ public class CarteiraControllerUser {
 
     @PostMapping("/adicionar")
     public ResponseEntity<MoedaDTO> adicionarMoeda(@RequestBody MoedaRequest request) {
-        // 2. O service agora retorna o DTO seguro
         MoedaDTO moedaSalvaDTO = carteiraService.adicionarMoeda(request);
 
-        // 3. (Opcional, mas profissional) Retorne 201 Created
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest() // Pega a URL atual ("/usuario/carteira/adicionar")
-                // Vamos assumir que temos um endpoint para ver a carteira
-                .path("/../") // Volta para "/usuario/carteira"
+                .fromCurrentRequest()
+                .path("/../")
                 .build()
                 .toUri();
 
@@ -46,7 +43,7 @@ public class CarteiraControllerUser {
         return ResponseEntity.ok(carteira);
     }
 
-    @DeleteMapping("/{coinId}") // Ex: DELETE /usuario/carteira/bitcoin
+    @DeleteMapping("/{coinId}")
     public ResponseEntity<Void> deletarMoeda(@PathVariable String coinId) {
         carteiraService.deletarMoeda(coinId);
         return ResponseEntity.noContent().build();
@@ -58,7 +55,7 @@ public class CarteiraControllerUser {
         return ResponseEntity.ok(usuarioResponseDTO);
     }
 
-    @GetMapping("/buscar-moeda") // URL: /usuario/carteira/buscar-moeda?query=bit
+    @GetMapping("/buscar-moeda")
     public ResponseEntity<List<CoinGeckoSearchResponse.CoinThumb>> buscarMoedas(@RequestParam String query) {
         if(query.isEmpty()) return ResponseEntity.ok(List.of());
 

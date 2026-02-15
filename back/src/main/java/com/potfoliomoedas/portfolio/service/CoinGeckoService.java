@@ -26,14 +26,12 @@ public class CoinGeckoService {
     @Autowired
     private MoedaRepository moedaRepository;
 
-    // INJEÇÃO DA CHAVE (Vem do application.properties)
-    @Value("${coingecko.api.key:}") // O ':' evita erro se a chave estiver vazia
+    @Value("${coingecko.api.key:}")
     private String apiKey;
 
     private Map<String, Map<String, Number>> CACHE_PRECOS = new ConcurrentHashMap<>();
     private Map<String, GraficoCache> CACHE_GRAFICOS = new ConcurrentHashMap<>();
 
-    // Controle de throttling para não chamar API demais
     private Map<String, Long> ULTIMA_ATUALIZACAO = new ConcurrentHashMap<>();
 
     private static class GraficoCache {
@@ -46,22 +44,18 @@ public class CoinGeckoService {
         }
 
         public boolean isExpirado() {
-            // Cache de 1 hora para gráficos (já que você tem a chave, pode ser menos, mas 1h é seguro)
             return (System.currentTimeMillis() - ultimaAtualizacao) > 3600000;
         }
     }
 
-    // --- O SEGREDO ESTÁ AQUI: Método Genérico que usa a Chave ---
     private <T> T getComChave(String url, Class<T> responseType) {
         try {
             HttpHeaders headers = new HttpHeaders();
-            // Se tiver chave, adiciona no cabeçalho
             if (apiKey != null && !apiKey.isEmpty()) {
                 headers.set("x-cg-demo-api-key", apiKey);
             }
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            // Usa 'exchange' para poder mandar os headers
             ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
             return response.getBody();
         } catch (Exception e) {
@@ -74,7 +68,6 @@ public class CoinGeckoService {
         return CACHE_PRECOS;
     }
 
-    // Atualiza a cada 5 minutos (300.000ms)
     @Scheduled(fixedRate = 1200000)
     public void atualizarPrecosAutomaticamente() {
         System.out.println("🤖 Robô: Iniciando atualização com API Key...");
@@ -85,7 +78,6 @@ public class CoinGeckoService {
         String idsParam = String.join(",", moedasNoBanco);
         String url = "https://api.coingecko.com/api/v3/simple/price?ids=" + idsParam + "&vs_currencies=brl,usd,eur";
 
-        // Substituimos o getForObject pelo nosso método seguro
         Map respostaApi = getComChave(url, Map.class);
 
         if (respostaApi != null && !respostaApi.isEmpty()) {
@@ -98,7 +90,6 @@ public class CoinGeckoService {
         long agora = System.currentTimeMillis();
         long ultimaVez = ULTIMA_ATUALIZACAO.getOrDefault(coinId, 0L);
 
-        // Proteção: Só atualiza se passou 2 minutos (mesmo com chave, economize)
         if (CACHE_PRECOS.containsKey(coinId) && (agora - ultimaVez) < 120000) {
             return;
         }

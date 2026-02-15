@@ -34,26 +34,17 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
     @Autowired
     private ConvertToDTO convertToDTO;
 
-    /**
-     * Adiciona uma moeda ao portfólio do usuário logado.
-     * Se a moeda já existir, apenas soma a quantidade.
-     */
     @Override
     public MoedaDTO adicionarMoeda(MoedaRequest requestDTO) {
         Usuario usuario = usuarioLogado.getUsuarioLogado();
 
-        // 1. Padroniza o ID (ex: "  BitCoin " vira "bitcoin")
         String coinIdTratado = requestDTO.coinId().trim().toLowerCase();
-
-        // === 🛡️ LÓGICA DE PROTEÇÃO DO LOGO ===
         String logoFinal = requestDTO.logo();
 
-        // Se o Front mandou VAZIO ou NULO, o Java assume o comando!
         if (logoFinal == null || logoFinal.isEmpty()) {
             System.out.println("🔍 Front não mandou logo (usuário digitou manual?). Buscando no Backend para: " + coinIdTratado);
             logoFinal = coinGeckoService.buscarUrlLogo(coinIdTratado);
         }
-        // ======================================
 
         Optional<Moeda> moedaOptional = moedaRepository
                 .findByUsuarioIdAndCoinId(usuario.getId(), coinIdTratado);
@@ -61,22 +52,18 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
         Moeda moedaParaSalvar;
 
         if (moedaOptional.isPresent()) {
-            // --- CENÁRIO: ATUALIZAR MOEDA EXISTENTE ---
             moedaParaSalvar = moedaOptional.get();
             moedaParaSalvar.setQuantidade(moedaParaSalvar.getQuantidade() + requestDTO.quantidade());
 
-            // Só atualiza o logo no banco se encontramos um logo válido novo
             if (logoFinal != null && !logoFinal.isEmpty()) {
                 moedaParaSalvar.setLogo(logoFinal);
             }
         } else {
-            // --- CENÁRIO: CRIAR NOVA MOEDA ---
             moedaParaSalvar = new Moeda();
             moedaParaSalvar.setCoinId(coinIdTratado);
             moedaParaSalvar.setQuantidade(requestDTO.quantidade());
             moedaParaSalvar.setUsuario(usuario);
 
-            // Salva o logo recuperado (ou null se não achou nada)
             moedaParaSalvar.setLogo(logoFinal);
             coinGeckoService.atualizarPrecoUnico(moedaParaSalvar.getCoinId());
         }
@@ -84,21 +71,16 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
         return new MoedaDTO(moedaSalva.getCoinId(), moedaSalva.getQuantidade());
     }
 
-    /**
-     * Calcula o valor total da carteira do usuário logado.
-     */
     @Override
     public Carteira calcularValorTotal() {
-        // 1. Pega o usuário e suas moedas
+
         Usuario usuario = usuarioLogado.getUsuarioLogado();
         List<Moeda> carteira = moedaRepository.findByUsuarioId(usuario.getId());
 
-        // 2. Coleta os IDs para a busca em lote
         List<String> listaIds = carteira.stream()
                 .map(Moeda::getCoinId)
                 .toList();
 
-        // 3. Busca os preços (Recebendo Number para evitar o erro de Cast)
         Map<String, Map<String, Number>> tabelaPrecos;
 
         if (listaIds.isEmpty()) {
@@ -107,24 +89,18 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
             tabelaPrecos = coinGeckoService.buscarPrecosEmLote(listaIds);
         }
 
-        // Variáveis acumuladoras
         double valorTotalBRL = 0.0;
         double valorTotalUSD = 0.0;
         double valorTotalEUR = 0.0;
         List<MoedaResponse> moedasResponse = new ArrayList<>();
 
-        // 4. Itera e calcula
         for (Moeda moeda : carteira) {
 
-            // Pega o mapa de preços dessa moeda (pode vir Integer ou Double)
             Map<String, Number> precosDaMoeda = tabelaPrecos.get(moeda.getCoinId());
 
-            // USANDO O MÉTODO SEGURO (Resolve o erro ClassCastException)
             double precoBRL = getValorSeguro(precosDaMoeda, "brl");
             double precoUSD = getValorSeguro(precosDaMoeda, "usd");
             double precoEUR = getValorSeguro(precosDaMoeda, "eur");
-
-            // Cálculos
             double totalMoedaBRL = precoBRL * moeda.getQuantidade();
             double totalMoedaUSD = precoUSD * moeda.getQuantidade();
             double totalMoedaEUR = precoEUR * moeda.getQuantidade();
@@ -159,25 +135,19 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
         );
     }
 
-    // =========================================================================
-// 👇 O SEGREDO ESTÁ AQUI: MÉTODO AUXILIAR PARA CONVERTER SEM QUEBRAR 👇
-// =========================================================================
     private double getValorSeguro(Map<String, Number> map, String currency) {
         if (map == null || !map.containsKey(currency) || map.get(currency) == null) {
             return 0.0;
         }
-        // .doubleValue() transforma Integer (500) em Double (500.0) com segurança
         return map.get(currency).doubleValue();
     }
 
-    // Adicione na Interface e na Implementação
     public void deletarMoeda(String coinId) {
         Usuario usuario = usuarioLogado.getUsuarioLogado();
 
         Moeda moeda = moedaRepository.findByUsuarioIdAndCoinId(usuario.getId(), coinId)
                 .orElseThrow(() -> new RuntimeException("Moeda não encontrada"));
 
-        // Deleta do banco
         moedaRepository.delete(moeda);
     }
 

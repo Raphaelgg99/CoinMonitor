@@ -61,8 +61,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/google").permitAll()
                         .requestMatchers("/usuario/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                ) // Authentication required for all other route
-                .csrf(AbstractHttpConfigurer::disable)// Disabling CSRF
+                )
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JWTFilter(jwtCreator), UsernamePasswordAuthenticationFilter.class)

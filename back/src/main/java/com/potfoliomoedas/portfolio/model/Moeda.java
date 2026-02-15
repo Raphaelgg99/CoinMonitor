@@ -15,15 +15,12 @@ public class Moeda {
     @Column(name = "logo_url")
     private String logo;
 
-    // O ID da moeda na API (ex: "bitcoin", "ethereum")
     @Column(nullable = false)
     private String coinId;
 
-    // A quantidade que o usuário possui
     @Column(nullable = false)
     private Double quantidade;
 
-    // O relacionamento: Muitas moedas (CoinPortfolio) pertencem a UM Usuário
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

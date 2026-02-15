@@ -24,11 +24,9 @@ public class CarteiraServiceAdminImpl implements CarteiraServiceAdmin {
 
     @Override
     public void deletarMoeda(String coinId, Long id) {
-        // 1. Encontre a moeda EXATA
         Moeda moedaParaDeletar = moedaRepository.findByUsuarioIdAndCoinId(id, coinId.trim())
                 .orElseThrow(() -> new MoedaNaoEncontradaException("Moeda não encontrada para o usuário " + id));
 
-        // 2. Delete a moeda DIRETAMENTE
         moedaRepository.delete(moedaParaDeletar);
     }
 
