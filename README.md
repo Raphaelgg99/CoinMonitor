@@ -2,7 +2,7 @@
 
 > Uma aplicação Fullstack robusta para monitoramento de criptomoedas em tempo real, com autenticação segura e gestão de perfil de usuário.
 
-🌐 **Acesso ao Projeto Ao Vivo:** [Clique aqui para acessar o CoinMonitor]([https://coin-monitor-gamma.vercel.app/])
+🌐 **Acesso ao Projeto Ao Vivo:** [Clique aqui para acessar o CoinMonitor](https://coin-monitor-gamma.vercel.app/)
 
 ---
 
