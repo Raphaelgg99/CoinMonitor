@@ -1,6 +1,7 @@
 package com.potfoliomoedas.portfolio.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.potfoliomoedas.portfolio.dto.MoedaDTO;
 import com.potfoliomoedas.portfolio.model.Moeda;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -18,7 +19,7 @@ public class AiService {
 
     private final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-    public String analisarCarteira(List<Moeda> moedasDoUsuario) {
+    public String analisarCarteira(List<MoedaDTO> moedasDoUsuario) {
         RestTemplate restTemplate = new RestTemplate();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -34,13 +35,15 @@ public class AiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        String promptSistema = "Você é um consultor financeiro sênior especialista em criptomoedas. " +
-                "Analise o seguinte portfólio de um usuário: " + carteiraEmJson + ". " +
+        String promptSistema = "Você é um Analista Sênior e Consultor Especialista ESTRITAMENTE em Criptomoedas, DeFi e Gestão de Risco de ativos digitais. " +
+                "Sua especialidade é avaliar a volatilidade e a diversificação de portfólios no mercado cripto. " +
+                "Analise o seguinte portfólio deste usuário: " + carteiraEmJson + ". " +
+                "Leve em consideração a proporção entre criptomoedas consolidadas (como Bitcoin e Ethereum), altcoins e memecoins. " +
                 "Responda ESTRITAMENTE em formato JSON com as seguintes chaves: " +
-                "\"score_risco\" (um número inteiro de 0 a 100 indicando o risco da carteira), " +
-                "\"analise_curta\" (um parágrafo de 3 linhas com um insight sobre a diversificação), e " +
-                "\"sugestao_rebalanceamento\" (uma lista com 2 ou 3 strings de dicas práticas). " +
-                "Não escreva nada além do JSON.";
+                "\"score_risco\" (um número inteiro de 0 a 100 indicando o risco da carteira, onde 100 é risco extremo), " +
+                "\"analise_curta\" (um parágrafo de 3 a 4 linhas com um insight técnico e direto sobre a atual alocação e exposição ao risco), e " +
+                "\"sugestao_rebalanceamento\" (uma lista com 2 ou 3 strings contendo dicas práticas de mercado). " +
+                "Não escreva nenhuma palavra, saudação ou marcação Markdown (como ```json) fora do JSON bruto.";;
 
         Map<String, Object> body = Map.of(
                 "model", "gpt-3.5-turbo", // Modelo rápido e barato (pode usar gpt-4o-mini se preferir)

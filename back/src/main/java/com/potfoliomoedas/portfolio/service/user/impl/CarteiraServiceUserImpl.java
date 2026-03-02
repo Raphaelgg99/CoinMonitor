@@ -169,7 +169,8 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
     @Override
     public String analisarCarteiraUsuario() {
         Usuario usuario = usuarioLogado.getUsuarioLogado();
-        return aiService.analisarCarteira(usuario.getCarteira());
+        UsuarioResponseDTO usuarioDTO = convertToDTO.convertUserToUserDTO(usuario);
+        return aiService.analisarCarteira(usuarioDTO.carteira());
     }
 
 
