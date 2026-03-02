@@ -78,5 +78,18 @@ buscarHistorico(coinId: string, dias: string, currency: string): Observable<any[
       `${this.apiUrl}/historico/${coinId}?dias=${dias}&currency=${currency}`,
       { headers }
     );
+  } 
+
+  analisarCarteiraUsuario(): Observable<any>{ 
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any>(
+      `${this.apiUrl}/analise-ia`,
+      { headers }
+    );
+
   }
 }

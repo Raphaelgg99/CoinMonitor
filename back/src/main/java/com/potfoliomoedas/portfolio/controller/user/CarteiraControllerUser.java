@@ -6,6 +6,7 @@ import com.potfoliomoedas.portfolio.service.CoinGeckoService;
 import com.potfoliomoedas.portfolio.service.user.CarteiraServiceUser;
 import com.potfoliomoedas.portfolio.service.user.impl.CarteiraServiceUserImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
@@ -61,6 +62,14 @@ public class CarteiraControllerUser {
 
         var resultado = coinGeckoService.buscarMoedasNaCoinGecko(query);
         return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping(value = "/analise-ia", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> analisarCarteiraComIA() {
+
+        String respostaIA = carteiraService.analisarCarteiraUsuario();
+
+        return ResponseEntity.ok(respostaIA);
     }
 
     @GetMapping("/historico/{coinId}")

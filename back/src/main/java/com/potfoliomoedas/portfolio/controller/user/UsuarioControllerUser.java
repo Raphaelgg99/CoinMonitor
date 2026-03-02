@@ -5,6 +5,7 @@ import com.potfoliomoedas.portfolio.dto.UsuarioResponseDTO;
 import com.potfoliomoedas.portfolio.dto.VerificarEmailDTO;
 import com.potfoliomoedas.portfolio.service.user.UsuarioServiceUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

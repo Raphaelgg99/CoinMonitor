@@ -60,7 +60,12 @@ export class DashboardComponent implements OnInit {
   public moedaGraficoId: string = '';
   public carregandoGrafico: boolean = false;
   public periodoSelecionado: string = '7';
-  mostrarAvisoPrecos: boolean = true;
+  mostrarAvisoPrecos: boolean = true; 
+
+  // === VARIÁVEIS DA IA 🤖 ===
+  isAnalisingIA: boolean = false;
+  resultadoIA: any = null;
+  erroIA: string | null = null;
 
   constructor(
     private carteiraService: CarteiraService,
@@ -123,8 +128,38 @@ export class DashboardComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-  }
+  } 
 
+  chamarIA() { 
+    // 1. Prepara o Modal: Inicia o "carregando" e limpa resultados/erros anteriores
+    this.isAnalisingIA = true;
+    this.resultadoIA = null;
+    this.erroIA = null;
+    this.cdr.detectChanges(); // Atualiza a tela para mostrar a bolinha girando
+
+    // 2. Chama o Service
+    this.carteiraService.analisarCarteiraUsuario().subscribe({
+      next: (resposta) => {
+        console.log('✅ IA Respondeu:', resposta);
+        
+        // 3. Salva o JSON lindo que veio do Java e para o carregamento
+        this.resultadoIA = resposta; 
+        this.isAnalisingIA = false;
+        
+        this.cdr.detectChanges();
+      }, 
+      error: (err) => {
+        console.error('❌ Erro na IA:', err);
+        
+        // 4. Se o ChatGPT demorar ou cair, mostramos um erro amigável no Modal
+        this.erroIA = 'Poxa, a Inteligência Artificial demorou a responder ou está indisponível. Tente novamente mais tarde.';
+        this.isAnalisingIA = false;
+        
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  
   abrirGrafico(coinId: string) {
     this.moedaGraficoId = coinId;
     this.periodoSelecionado = '7';

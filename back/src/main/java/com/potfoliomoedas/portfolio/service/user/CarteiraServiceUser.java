@@ -10,4 +10,5 @@ public interface CarteiraServiceUser {
     MoedaDTO adicionarMoeda(MoedaRequest request);
     UsuarioResponseDTO editarQuantidade(MoedaRequest request);
     Carteira calcularValorTotal();
+    String analisarCarteiraUsuario();
 }

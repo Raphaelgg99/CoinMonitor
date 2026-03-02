@@ -8,6 +8,7 @@ import com.potfoliomoedas.portfolio.dto.VerificarEmailDTO;
 import com.potfoliomoedas.portfolio.exception.*;
 import com.potfoliomoedas.portfolio.model.Usuario;
 import com.potfoliomoedas.portfolio.repository.UsuarioRepository;
+import com.potfoliomoedas.portfolio.service.AiService;
 import com.potfoliomoedas.portfolio.service.EmailService;
 import com.potfoliomoedas.portfolio.service.user.UsuarioServiceUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class UsuarioServiceUserImpl implements UsuarioServiceUser {
 
     @Autowired
     private EmailService emailService;
+
 
     @Override
     public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO requestDTO){

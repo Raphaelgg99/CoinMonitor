@@ -7,6 +7,7 @@ import com.potfoliomoedas.portfolio.model.Moeda;
 import com.potfoliomoedas.portfolio.model.Usuario;
 import com.potfoliomoedas.portfolio.repository.MoedaRepository;
 import com.potfoliomoedas.portfolio.repository.UsuarioRepository;
+import com.potfoliomoedas.portfolio.service.AiService;
 import com.potfoliomoedas.portfolio.service.CoinGeckoService;
 import com.potfoliomoedas.portfolio.service.user.CarteiraServiceUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
 
     @Autowired
     private ConvertToDTO convertToDTO;
+
+    @Autowired
+    private AiService aiService;
 
     @Override
     public MoedaDTO adicionarMoeda(MoedaRequest requestDTO) {
@@ -160,6 +164,12 @@ public class CarteiraServiceUserImpl implements CarteiraServiceUser {
         moedaRepository.save(moeda);
         return convertToDTO.convertUserToUserDTO(usuario);
 
+    }
+
+    @Override
+    public String analisarCarteiraUsuario() {
+        Usuario usuario = usuarioLogado.getUsuarioLogado();
+        return aiService.analisarCarteira(usuario.getCarteira());
     }
 
 

@@ -65,9 +65,16 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 class="text-white">Meus Ativos</h3>
-      <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
-        Adicionar Moeda +
-      </button> 
+      
+      <div class="d-flex gap-3">
+        <button class="btn btn-warning fw-bold text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAnaliseIA" (click)="chamarIA()">
+          <i class="bi bi-robot"></i> Analisar com IA ✨
+        </button>
+        
+        <button class="btn btn-outline-info shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
+          Adicionar Moeda +
+        </button> 
+      </div>
     </div>
 
     <div class="table-responsive">
@@ -353,6 +360,75 @@
         </div>
 
       </div>
+    </div>
+  </div>
+</div> 
+<div class="modal fade" id="modalAnaliseIA" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-white border-warning" style="box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);">
+      
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-warning fw-bold">
+          <i class="bi bi-robot"></i> Consultor Financeiro IA
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      
+      <div class="modal-body p-4">
+        
+        <div *ngIf="isAnalisingIA" class="text-center py-5">
+          <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status"></div>
+          <h5 class="mt-4 text-white">Analisando sua carteira...</h5>
+          <p class="text-muted small">Nossa inteligência artificial está calculando os riscos e a diversificação dos seus ativos.</p>
+        </div>
+
+        <div *ngIf="!isAnalisingIA && erroIA" class="alert alert-danger text-center">
+          <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+          <p class="mb-0 mt-2">{{ erroIA }}</p>
+        </div>
+
+        <div *ngIf="!isAnalisingIA && resultadoIA">
+          
+          <div class="text-center mb-5">
+            <h6 class="text-uppercase text-muted mb-2">Score de Risco</h6>
+            <h1 class="display-1 fw-bold mb-0" 
+                [ngClass]="{
+                  'text-success': resultadoIA.score_risco <= 40, 
+                  'text-warning': resultadoIA.score_risco > 40 && resultadoIA.score_risco <= 70, 
+                  'text-danger': resultadoIA.score_risco > 70
+                }">
+              {{ resultadoIA.score_risco }}<span class="fs-4 text-muted">/100</span>
+            </h1>
+            <p class="text-muted small mt-2">
+              <span *ngIf="resultadoIA.score_risco <= 40">Sua carteira é considerada Segura/Conservadora.</span>
+              <span *ngIf="resultadoIA.score_risco > 40 && resultadoIA.score_risco <= 70">Sua carteira tem Risco Moderado.</span>
+              <span *ngIf="resultadoIA.score_risco > 70">Atenção! Sua carteira possui Alto Risco de volatilidade.</span>
+            </p>
+          </div>
+
+          <div class="card bg-secondary text-white border-0 mb-4 shadow-sm">
+            <div class="card-body p-4">
+              <h6 class="card-title text-info fw-bold mb-3"><i class="bi bi-chat-quote-fill me-2"></i>Parecer da IA</h6>
+              <p class="card-text mb-0 fs-6" style="line-height: 1.6;">{{ resultadoIA.analise_curta }}</p>
+            </div>
+          </div>
+
+          <h6 class="text-warning fw-bold mb-3"><i class="bi bi-lightbulb-fill me-2"></i>Sugestões Práticas</h6>
+          <ul class="list-group list-group-flush rounded border border-secondary">
+            <li class="list-group-item bg-dark text-white border-secondary d-flex align-items-start p-3" *ngFor="let dica of resultadoIA.sugestao_rebalanceamento">
+              <i class="bi bi-check2-circle text-success me-3 fs-5"></i> 
+              <span style="line-height: 1.5;">{{ dica }}</span>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+      
+      <div class="modal-footer border-secondary justify-content-center">
+        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Fechar Relatório</button>
+      </div>
+
     </div>
   </div>
 </div>
