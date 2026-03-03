@@ -76,3 +76,30 @@ Antes de começar, você precisará ter as seguintes ferramentas instaladas em s
 ### 1. Clonando o Repositório
 ```bash
 git clone [https://github.com/Raphaelgg99/CoinMonitor.git](https://github.com/Raphaelgg99/CoinMonitor.git)
+```
+
+### 2. Configurando e Rodando o Backend (Spring Boot)
+1. Navegue até a pasta do backend (ex: `cd back` ou `cd backend`).
+2. Configure as variáveis de ambiente na sua máquina/IDE (ou diretamente no `application.properties` para testes locais):
+   - Usuário, senha e URL do banco PostgreSQL local.
+   - Chaves de API (OpenAI e CoinGecko).
+3. Execute o projeto via terminal utilizando o Maven:
+```bash
+mvn spring-boot:run
+```
+*(O servidor iniciará na porta `8080` por padrão).*
+
+### 3. Configurando e Rodando o Frontend (Angular)
+1. Abra um novo terminal e navegue até a pasta do frontend (ex: `cd front` ou `cd frontend`).
+2. Instale todas as dependências do projeto:
+```bash
+npm install
+```
+3. Inicie o servidor de desenvolvimento do Angular:
+```bash
+ng serve
+```
+
+### 4. Acessando a Aplicação
+Com os dois servidores rodando, abra o seu navegador e acesse:
+👉 **http://localhost:4200**
