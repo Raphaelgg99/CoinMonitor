@@ -1,0 +1,49 @@
+name: CI - Backend Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Sobe um PostgreSQL temporário gratuito
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: coinmonitor_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Baixar o código
+        uses: actions/checkout@v4
+
+      - name: ☕ Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 🧪 Rodar os testes
+        working-directory: ./back
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/coinmonitor_test
+          SPRING_DATASOURCE_USERNAME: test_user
+          SPRING_DATASOURCE_PASSWORD: test_password
+          JWT_SECRET: fake-secret-for-testing-only-1234567890
+          CORS_ORIGINS: http://localhost:4200
+          COINGECKO_API_KEY: fake-key
+          OPENAI_API_KEY: fake-key
+        run: mvn test
