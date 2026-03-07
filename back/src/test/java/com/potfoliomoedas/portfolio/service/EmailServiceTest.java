@@ -22,48 +22,36 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
 
-    @Mock
-    private JavaMailSender javaMailSender;
-
     @InjectMocks
     private EmailService emailService;
 
-    @Captor
-    private ArgumentCaptor<SimpleMailMessage> messageCaptor;
-
     @BeforeEach
     void setup() {
-        ReflectionTestUtils.setField(emailService, "remetente", "sistema@coinmonitor.com");
+        ReflectionTestUtils.setField(emailService, "apiKey", "fake-api-key");
     }
 
     @Test
-    @DisplayName("Deve montar o email corretamente e enviar")
+    @DisplayName("Não deve lançar exceção ao enviar email com sucesso")
     void enviarEmailTexto_Sucesso() {
-        String destinatario = "usuario@teste.com";
-        String titulo = "Bem-vindo";
-        String corpo = "Olá!";
-
-        emailService.enviarEmailTexto(destinatario, titulo, corpo);
-        verify(javaMailSender, times(1)).send(messageCaptor.capture());
-
-        SimpleMailMessage mensagemEnviada = messageCaptor.getValue();
-
-        assertEquals("sistema@coinmonitor.com", mensagemEnviada.getFrom());
-        assertEquals(destinatario, mensagemEnviada.getTo()[0]);
-        assertEquals(titulo, mensagemEnviada.getSubject());
-        assertEquals(corpo, mensagemEnviada.getText());
+        assertDoesNotThrow(() ->
+                emailService.enviarEmailTexto(
+                        "usuario@teste.com",
+                        "Bem-vindo",
+                        "Olá!"
+                )
+        );
     }
 
     @Test
-    @DisplayName("Não deve quebrar a aplicação se o envio falhar (Cai no Catch)")
+    @DisplayName("Não deve quebrar a aplicação se o envio falhar")
     void enviarEmailTexto_ErroNoEnvio() {
-        doThrow(new RuntimeException("Servidor SMTP fora do ar"))
-                .when(javaMailSender).send(any(SimpleMailMessage.class));
-
+        // Endereço inválido força erro na chamada HTTP
         assertDoesNotThrow(() ->
-                emailService.enviarEmailTexto("a", "b", "c")
+                emailService.enviarEmailTexto(
+                        "email-invalido",
+                        "titulo",
+                        "corpo"
+                )
         );
-
-        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
     }
 }

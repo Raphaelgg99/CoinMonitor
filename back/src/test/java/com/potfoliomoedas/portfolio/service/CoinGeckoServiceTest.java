@@ -37,23 +37,45 @@ class CoinGeckoServiceTest {
         String id = "bitcoin";
         String dias = "7";
         String moeda = "usd";
+
         List<Number> ponto1 = List.of(1620000000000L, 50000.0);
         List<Number> ponto2 = List.of(1620000001000L, 51000.0);
         List<List<Number>> dadosApi = List.of(ponto1, ponto2);
         Map<String, Object> respostaApi = Map.of("prices", dadosApi);
-        when(restTemplate.getForObject(anyString(), eq(Map.class))).thenReturn(respostaApi);
+
+        // ✅ Mockando exchange() que é o que o service realmente usa
+        when(restTemplate.exchange(
+                anyString(),
+                eq(org.springframework.http.HttpMethod.GET),
+                any(org.springframework.http.HttpEntity.class),
+                eq(Map.class)
+        )).thenReturn(org.springframework.http.ResponseEntity.ok(respostaApi));
+
         List<List<Number>> resultado1 = service.buscarHistorico(id, dias, moeda);
         List<List<Number>> resultado2 = service.buscarHistorico(id, dias, moeda);
+
         assertEquals(2, resultado1.size());
         assertEquals(2, resultado2.size());
-        verify(restTemplate, times(1)).getForObject(anyString(), eq(Map.class));
+
+        // ✅ API chamada só 1 vez — segunda vez veio do cache
+        verify(restTemplate, times(1)).exchange(
+                anyString(),
+                eq(org.springframework.http.HttpMethod.GET),
+                any(org.springframework.http.HttpEntity.class),
+                eq(Map.class)
+        );
     }
 
     @Test
-    @DisplayName("Deve retornar cache antigo ou vazio se a API falhar")
+    @DisplayName("Deve retornar lista vazia se a API falhar")
     void deveTratarErroDaApi() {
-        when(restTemplate.getForObject(anyString(), eq(Map.class)))
-                .thenThrow(new RuntimeException("API fora do ar"));
+        // ✅ Mockando exchange() lançando exceção
+        when(restTemplate.exchange(
+                anyString(),
+                eq(org.springframework.http.HttpMethod.GET),
+                any(org.springframework.http.HttpEntity.class),
+                eq(Map.class)
+        )).thenThrow(new RuntimeException("API fora do ar"));
 
         List<List<Number>> resultado = service.buscarHistorico("bitcoin", "7", "usd");
 

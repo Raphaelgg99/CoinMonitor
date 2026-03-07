@@ -57,15 +57,13 @@ class CarteiraControllerUserTest {
     @Autowired
     private EntityManager em;
 
-    // --- MOCKS ---
     @MockitoBean
     private UsuarioLogado usuarioLogado;
 
-    @Autowired
-    private CoinGeckoService coinGeckoService;
-
+    // ✅ Mockamos o SERVICE inteiro, não o RestTemplate
+    // O CoinGeckoService já tem seus próprios testes unitários
     @MockitoBean
-    private RestTemplate restTemplate;
+    private CoinGeckoService coinGeckoService;
 
     @BeforeEach
     void setup() {
@@ -83,8 +81,8 @@ class CarteiraControllerUserTest {
         usuarioRepository.save(investidor);
 
         when(usuarioLogado.getUsuarioLogado()).thenReturn(investidor);
-        when(restTemplate.getForObject(anyString(), eq(Map.class)))
-                .thenReturn(Map.of("bitcoin", Map.of("brl", 350000.0, "usd", 70000.0)));
+        // ✅ Mockamos o service diretamente
+        when(coinGeckoService.buscarUrlLogo(anyString())).thenReturn("http://fake.url/logo.png");
 
         MoedaRequest request = new MoedaRequest("bitcoin", 0.5, "http://fake.url/logo.png");
         mockMvc.perform(post("/usuario/carteira/adicionar")
@@ -107,18 +105,18 @@ class CarteiraControllerUserTest {
 
         Moeda btc = new Moeda();
         btc.setCoinId("bitcoin");
-        btc.setQuantidade(1.0); // 1 Bitcoin
+        btc.setQuantidade(1.0);
         btc.setUsuario(usuario);
         btc.setLogo("url");
         moedaRepository.save(btc);
         em.flush();
 
-        when(restTemplate.getForObject(anyString(), eq(Map.class)))
+        // ✅ Mockamos o cache de preços retornado pelo service
+        when(coinGeckoService.buscarPrecosEmLote(anyList()))
                 .thenReturn(Map.of("bitcoin", Map.of("brl", 5000.0, "usd", 1000.0, "eur", 900.0)));
-        coinGeckoService.atualizarPrecosAutomaticamente();
+
         mockMvc.perform(get("/usuario/carteira")
                         .contentType(MediaType.APPLICATION_JSON))
-                // 3. ASSERT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.usuarioNome").value("Rico"))
                 .andExpect(jsonPath("$.seuSaldoTotalBRL").value(5000.0));
@@ -140,9 +138,11 @@ class CarteiraControllerUserTest {
         moeda.setUsuario(investidor);
         moeda.setLogo("fake");
         moedaRepository.save(moeda);
+
         mockMvc.perform(delete("/usuario/carteira/bitcoin")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+
         assertEquals(0, moedaRepository.count());
     }
 
@@ -154,7 +154,6 @@ class CarteiraControllerUserTest {
         usuario.setEmail("trader@email.com");
         usuario.setSenha("123456");
         usuarioRepository.save(usuario);
-
         when(usuarioLogado.getUsuarioLogado()).thenReturn(usuario);
 
         Moeda moedaExistente = new Moeda();
@@ -163,12 +162,9 @@ class CarteiraControllerUserTest {
         moedaExistente.setUsuario(usuario);
         moedaExistente.setLogo("http://fake.logo");
         moedaRepository.save(moedaExistente);
-        when(restTemplate.getForObject(anyString(), eq(Map.class)))
-                .thenReturn(Map.of("bitcoin", Map.of("brl", 100000.0, "usd", 20000.0)));
 
-        MoedaRequest request = new MoedaRequest("bitcoin", 5.0, "http://logo.fake"); // Novo valor
+        MoedaRequest request = new MoedaRequest("bitcoin", 5.0, "http://logo.fake");
 
-        // 2. ACT
         mockMvc.perform(put("/usuario/carteira")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -191,11 +187,11 @@ class CarteiraControllerUserTest {
         CoinGeckoSearchResponse.CoinThumb moedaFake = new CoinGeckoSearchResponse.CoinThumb(
                 "bitcoin", "Bitcoin", "BTC", "http://logo.url"
         );
-        CoinGeckoSearchResponse respostaFake = new CoinGeckoSearchResponse(List.of(moedaFake));
-        when(restTemplate.getForObject(
-                contains("search?query=" + termoBusca),
-                eq(CoinGeckoSearchResponse.class)
-        )).thenReturn(respostaFake);
+
+        // ✅ Mockamos o método exato do service que o controller chama
+        when(coinGeckoService.buscarMoedasNaCoinGecko(termoBusca))
+                .thenReturn(List.of(moedaFake));
+
         mockMvc.perform(get("/usuario/carteira/buscar-moeda")
                         .param("query", termoBusca)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -211,16 +207,15 @@ class CarteiraControllerUserTest {
         String coinId = "bitcoin";
         String dias = "7";
         String currency = "brl";
+
         List<List<Number>> listaPrecos = List.of(
                 List.of(1700000000000L, 200000.50),
                 List.of(1700086400000L, 205000.00)
         );
-        Map<String, Object> respostaApiFake = Map.of("prices", listaPrecos);
 
-        when(restTemplate.getForObject(
-                contains("/market_chart"),
-                eq(Map.class)
-        )).thenReturn(respostaApiFake);
+        // ✅ Mockamos o método exato do service que o controller chama
+        when(coinGeckoService.buscarHistorico(coinId, dias, currency))
+                .thenReturn(listaPrecos);
 
         mockMvc.perform(get("/usuario/carteira/historico/" + coinId)
                         .param("dias", dias)
