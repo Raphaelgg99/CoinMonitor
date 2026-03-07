@@ -39,7 +39,7 @@ jobs:
       - name: 🧪 Rodar os testes
         working-directory: ./back
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/coinmonitor_test
+          SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
           SPRING_DATASOURCE_USERNAME: test_user
           SPRING_DATASOURCE_PASSWORD: test_password
           JWT_SECRET: fake-secret-for-testing-only-1234567890
@@ -48,4 +48,4 @@ jobs:
           OPENAI_API_KEY: fake-key
           BREVO_API_KEY: fake-brevo-key
           GOOGLE_CLIENT_ID: fake-client-id.apps.googleusercontent.com
-        run: mvn test
+        run: mvn test -e
