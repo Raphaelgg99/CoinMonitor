@@ -46,4 +46,6 @@ jobs:
           CORS_ORIGINS: http://localhost:4200
           COINGECKO_API_KEY: fake-key
           OPENAI_API_KEY: fake-key
+          BREVO_API_KEY: fake-brevo-key
+          GOOGLE_CLIENT_ID: fake-client-id.apps.googleusercontent.com
         run: mvn test
