@@ -8,7 +8,7 @@ import { UsuarioResponseDTO } from '../models/usuario.model';
 })
 export class UserService {
 
-  private apiUrl = 'https://coinmonitor.onrender.com/usuario';
+  private apiUrl = 'http://coinmonitor-env.eba-t8mjmt5k.us-east-2.elasticbeanstalk.com/usuario';
 
   constructor(private http: HttpClient) { }
 

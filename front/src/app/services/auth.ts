@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private apiUrl = 'https://coinmonitor.onrender.com';
+  private apiUrl = 'http://coinmonitor-env.eba-t8mjmt5k.us-east-2.elasticbeanstalk.com';
 
   constructor(private http: HttpClient, private router: Router) { }
 

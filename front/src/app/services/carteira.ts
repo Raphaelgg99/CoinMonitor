@@ -8,7 +8,7 @@ import { CarteiraResponse } from '../models/carteira.model';
 })
 export class CarteiraService {
 
-  private apiUrl = 'https://coinmonitor.onrender.com/usuario/carteira';
+  private apiUrl = 'http://coinmonitor-env.eba-t8mjmt5k.us-east-2.elasticbeanstalk.com/usuario/carteira';
 
   constructor(private http: HttpClient) { }
 
