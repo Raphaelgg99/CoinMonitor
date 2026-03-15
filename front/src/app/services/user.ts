@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UsuarioResponseDTO } from '../models/usuario.model';
+import { UsuarioResponseDTO } from '../models/usuario.model'; 
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
 
-  private apiUrl = 'http://coinmonitor-env.eba-t8mjmt5k.us-east-2.elasticbeanstalk.com/usuario';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -18,7 +19,7 @@ export class UserService {
         'Authorization': `Bearer ${token}`
       });
 
-      return this.http.get<UsuarioResponseDTO>(this.apiUrl, { headers });
+      return this.http.get<UsuarioResponseDTO>(`${this.apiUrl}/usuario`, { headers });
     }
 
   update(usuarioEditado: any): Observable<any> {
@@ -35,7 +36,7 @@ export class UserService {
       senha: usuarioEditado.senha
     };
 
-    return this.http.put(`${this.apiUrl}`,  payload, { headers })
+    return this.http.put(`${this.apiUrl}/usuario`,  payload, { headers })
   }
 
 uploadFoto(file: File): Observable<any> {
@@ -48,7 +49,7 @@ uploadFoto(file: File): Observable<any> {
         'Authorization': `Bearer ${token}`
     });
 
-  return this.http.post(`${this.apiUrl}/foto`, formData, {headers});
+  return this.http.post(`${this.apiUrl}/usuario/foto`, formData, {headers});
 }
 
 deleteUser(): Observable<any>{
@@ -57,6 +58,6 @@ deleteUser(): Observable<any>{
     const headers = new HttpHeaders({
         'Authorization': `Bearer ${token}`
       });
-  return this.http.delete(`${this.apiUrl}`, {headers});
+  return this.http.delete(`${this.apiUrl}/usuario`, {headers});
 }
 }

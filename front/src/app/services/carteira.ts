@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CarteiraResponse } from '../models/carteira.model';
+import { CarteiraResponse } from '../models/carteira.model'; 
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarteiraService {
 
-  private apiUrl = 'http://coinmonitor-env.eba-t8mjmt5k.us-east-2.elasticbeanstalk.com/usuario/carteira';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -19,7 +20,7 @@ export class CarteiraService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get<CarteiraResponse>(this.apiUrl, { headers });
+    return this.http.get<CarteiraResponse>(`${this.apiUrl}/usuario/carteira`, { headers });
   }
 
   adicionarMoeda(coinId: string, quantidade: number, logo: string): Observable<any> {
@@ -33,7 +34,7 @@ export class CarteiraService {
       quantidade: quantidade,
       logo: logo
      };
-    return this.http.post(`${this.apiUrl}/adicionar`, body, { headers });
+    return this.http.post(`${this.apiUrl}/usuario/carteira/adicionar`, body, { headers });
   }
 
   deletarMoeda(coinId: string): Observable<any> {
@@ -43,7 +44,7 @@ export class CarteiraService {
     });
 
     const body = { coinId };
-    return this.http.delete(`${this.apiUrl}/${coinId}`, {headers} );
+    return this.http.delete(`${this.apiUrl}/usuario/carteira/${coinId}`, {headers} );
   }
 
   editarQuantidade(coinId: string, novaQuantidade: number): Observable<any> {
@@ -56,7 +57,7 @@ export class CarteiraService {
       coinId: coinId,
       quantidade: novaQuantidade
      };
-    return this.http.put(`${this.apiUrl}`, body, { headers });
+    return this.http.put(`${this.apiUrl}/usuario/carteira`, body, { headers });
 }
 
 buscarMoedasCoinGecko(query: string): Observable<any> {
@@ -65,7 +66,7 @@ buscarMoedasCoinGecko(query: string): Observable<any> {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.get(`${this.apiUrl}/buscar-moeda?query=${query}`, { headers });
+    return this.http.get(`${this.apiUrl}/usuario/carteira/buscar-moeda?query=${query}`, { headers });
   }
 
 buscarHistorico(coinId: string, dias: string, currency: string): Observable<any[]> {
@@ -75,7 +76,7 @@ buscarHistorico(coinId: string, dias: string, currency: string): Observable<any[
     });
 
     return this.http.get<any[]>(
-      `${this.apiUrl}/historico/${coinId}?dias=${dias}&currency=${currency}`,
+      `${this.apiUrl}/usuario/carteira/historico/${coinId}?dias=${dias}&currency=${currency}`,
       { headers }
     );
   } 
@@ -87,7 +88,7 @@ buscarHistorico(coinId: string, dias: string, currency: string): Observable<any[
     });
 
     return this.http.get<any>(
-      `${this.apiUrl}/analise-ia`,
+      `${this.apiUrl}/usuario/carteira/analise-ia`,
       { headers }
     );
 
